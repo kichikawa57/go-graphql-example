@@ -6,7 +6,8 @@ services:
     image: postgres:13.1-alpine
     container_name: db
     volumes:
-      - ./tmp/db:/var/lib/postgresql/data
+      - ./db/tmp:/var/lib/postgresql/data
+      - ./db/initdb:/docker-entrypoint-initdb.d
     ports:
       - 15432:5432
     environment:
