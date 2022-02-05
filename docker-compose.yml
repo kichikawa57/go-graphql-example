@@ -1,0 +1,35 @@
+version: "3.8"
+
+services:
+  db:
+    platform: linux/x86_64
+    image: postgres:13.1-alpine
+    container_name: db
+    volumes:
+      - ./tmp/db:/var/lib/postgresql/data
+    ports:
+      - 15432:5432
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      PGDATA: /var/lib/postgresql/data/pgdata
+
+  web:
+    platform: linux/x86_64
+    build:
+      context: .
+      dockerfile: ./docker/Dockerfile
+      target: dev
+    container_name: api
+    env_file:
+      - .env
+    working_dir: /go/src/github.com/kichikawa
+    # tty: true
+    # stdin_open: true
+    volumes:
+      - .:/go/src/github.com/kichikawa
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    command: air

@@ -1,0 +1,6 @@
+{
+  "url": "/ping",
+  "type": "lawyer",
+  "method": "GET",
+  "body": null
+}
