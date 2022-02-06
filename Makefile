@@ -58,4 +58,4 @@ schema-add:
 
 .PHONY: schema-gen
 schema-gen:
-	docker exec api go generate ./ent
+	docker exec api go generate ./...
