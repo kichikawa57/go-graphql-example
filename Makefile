@@ -1,4 +1,6 @@
 
+NAME=User
+
 .PHONY: start
 start:
 	docker-compose up -d
@@ -6,6 +8,10 @@ start:
 .PHONY: build
 build:
 	docker-compose up -d --build
+
+.PHONY: log
+log:
+	docker-compose logs
 
 .PHONY: log
 log:
@@ -45,3 +51,11 @@ test:
 
 .PHONY: restart
 restart: kill start
+
+.PHONY: schema-add
+schema-add:
+	docker exec api go run entgo.io/ent/cmd/ent init ${NAME}
+
+.PHONY: schema-gen
+schema-gen:
+	docker exec api go generate ./ent
