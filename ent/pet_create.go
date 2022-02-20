@@ -10,8 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/pet"
-	"github.com/kichikawa/ent/schema"
 )
 
 // PetCreate is the builder for creating a Pet entity.
@@ -56,8 +56,16 @@ func (pc *PetCreate) SetName(s string) *PetCreate {
 }
 
 // SetID sets the "id" field.
-func (pc *PetCreate) SetID(si schema.PetId) *PetCreate {
-	pc.mutation.SetID(si)
+func (pc *PetCreate) SetID(u uuid.UUID) *PetCreate {
+	pc.mutation.SetID(u)
+	return pc
+}
+
+// SetNillableID sets the "id" field if the given value is not nil.
+func (pc *PetCreate) SetNillableID(u *uuid.UUID) *PetCreate {
+	if u != nil {
+		pc.SetID(*u)
+	}
 	return pc
 }
 
@@ -140,6 +148,10 @@ func (pc *PetCreate) defaults() {
 		v := pet.DefaultUpdatedAt()
 		pc.mutation.SetUpdatedAt(v)
 	}
+	if _, ok := pc.mutation.ID(); !ok {
+		v := pet.DefaultID()
+		pc.mutation.SetID(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -164,9 +176,12 @@ func (pc *PetCreate) sqlSave(ctx context.Context) (*Pet, error) {
 		}
 		return nil, err
 	}
-	if _spec.ID.Value != _node.ID {
-		id := _spec.ID.Value.(int64)
-		_node.ID = schema.PetId(id)
+	if _spec.ID.Value != nil {
+		if id, ok := _spec.ID.Value.(*uuid.UUID); ok {
+			_node.ID = *id
+		} else if err := _node.ID.Scan(_spec.ID.Value); err != nil {
+			return nil, err
+		}
 	}
 	return _node, nil
 }
@@ -177,14 +192,14 @@ func (pc *PetCreate) createSpec() (*Pet, *sqlgraph.CreateSpec) {
 		_spec = &sqlgraph.CreateSpec{
 			Table: pet.Table,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: pet.FieldID,
 			},
 		}
 	)
 	if id, ok := pc.mutation.ID(); ok {
 		_node.ID = id
-		_spec.ID.Value = id
+		_spec.ID.Value = &id
 	}
 	if value, ok := pc.mutation.CreatedAt(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -255,10 +270,6 @@ func (pcb *PetCreateBulk) Save(ctx context.Context) ([]*Pet, error) {
 				}
 				mutation.id = &nodes[i].ID
 				mutation.done = true
-				if specs[i].ID.Value != nil && nodes[i].ID == 0 {
-					id := specs[i].ID.Value.(int64)
-					nodes[i].ID = schema.PetId(id)
-				}
 				return nodes[i], nil
 			})
 			for i := len(builder.hooks) - 1; i >= 0; i-- {

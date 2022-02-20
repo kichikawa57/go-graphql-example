@@ -5,6 +5,8 @@ package ent
 import (
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/kichikawa/ent/group"
 	"github.com/kichikawa/ent/pet"
 	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/ent/user"
@@ -14,6 +16,12 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	groupFields := schema.Group{}.Fields()
+	_ = groupFields
+	// groupDescID is the schema descriptor for id field.
+	groupDescID := groupFields[0].Descriptor()
+	// group.DefaultID holds the default value on creation for the id field.
+	group.DefaultID = groupDescID.Default.(func() uuid.UUID)
 	petMixin := schema.Pet{}.Mixin()
 	petMixinFields0 := petMixin[0].Fields()
 	_ = petMixinFields0
@@ -29,6 +37,10 @@ func init() {
 	pet.DefaultUpdatedAt = petDescUpdatedAt.Default.(func() time.Time)
 	// pet.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	pet.UpdateDefaultUpdatedAt = petDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// petDescID is the schema descriptor for id field.
+	petDescID := petFields[0].Descriptor()
+	// pet.DefaultID holds the default value on creation for the id field.
+	pet.DefaultID = petDescID.Default.(func() uuid.UUID)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0
@@ -44,4 +56,8 @@ func init() {
 	user.DefaultUpdatedAt = userDescUpdatedAt.Default.(func() time.Time)
 	// user.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
 	user.UpdateDefaultUpdatedAt = userDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// userDescID is the schema descriptor for id field.
+	userDescID := userFields[0].Descriptor()
+	// user.DefaultID holds the default value on creation for the id field.
+	user.DefaultID = userDescID.Default.(func() uuid.UUID)
 }

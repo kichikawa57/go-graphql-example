@@ -8,22 +8,22 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/pet"
-	"github.com/kichikawa/ent/schema"
 )
 
 // Pet is the model entity for the Pet schema.
 type Pet struct {
 	config `json:"-"`
 	// ID of the ent.
-	ID schema.PetId `json:"id,omitempty"`
+	ID uuid.UUID `json:"id,omitempty"`
 	// CreatedAt holds the value of the "created_at" field.
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// Name holds the value of the "name" field.
 	Name    string `json:"name,omitempty"`
-	user_id *schema.UserId
+	user_id *uuid.UUID
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -31,14 +31,14 @@ func (*Pet) scanValues(columns []string) ([]interface{}, error) {
 	values := make([]interface{}, len(columns))
 	for i := range columns {
 		switch columns[i] {
-		case pet.FieldID:
-			values[i] = new(sql.NullInt64)
 		case pet.FieldName:
 			values[i] = new(sql.NullString)
 		case pet.FieldCreatedAt, pet.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
+		case pet.FieldID:
+			values[i] = new(uuid.UUID)
 		case pet.ForeignKeys[0]: // user_id
-			values[i] = new(sql.NullInt64)
+			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
 		default:
 			return nil, fmt.Errorf("unexpected column %q for type Pet", columns[i])
 		}
@@ -55,11 +55,11 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 	for i := range columns {
 		switch columns[i] {
 		case pet.FieldID:
-			value, ok := values[i].(*sql.NullInt64)
-			if !ok {
-				return fmt.Errorf("unexpected type %T for field id", value)
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field id", values[i])
+			} else if value != nil {
+				pe.ID = *value
 			}
-			pe.ID = schema.PetId(value.Int64)
 		case pet.FieldCreatedAt:
 			if value, ok := values[i].(*sql.NullTime); !ok {
 				return fmt.Errorf("unexpected type %T for field created_at", values[i])
@@ -79,11 +79,11 @@ func (pe *Pet) assignValues(columns []string, values []interface{}) error {
 				pe.Name = value.String
 			}
 		case pet.ForeignKeys[0]:
-			if value, ok := values[i].(*sql.NullInt64); !ok {
-				return fmt.Errorf("unexpected type %T for edge-field user_id", value)
+			if value, ok := values[i].(*sql.NullScanner); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
 			} else if value.Valid {
-				pe.user_id = new(schema.UserId)
-				*pe.user_id = schema.UserId(value.Int64)
+				pe.user_id = new(uuid.UUID)
+				*pe.user_id = *value.S.(*uuid.UUID)
 			}
 		}
 	}

@@ -4,11 +4,10 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // Group holds the schema definition for the Group entity.
-type GroupId int
-
 type Group struct {
 	ent.Schema
 }
@@ -16,7 +15,8 @@ type Group struct {
 // Fields of the Group.
 func (Group) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").GoType(GroupId(0)),
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New),
 		field.String("unique_name").Unique(),
 		field.String("name"),
 	}

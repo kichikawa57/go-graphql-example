@@ -12,9 +12,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/group"
 	"github.com/kichikawa/ent/predicate"
-	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -111,8 +111,8 @@ func (gq *GroupQuery) FirstX(ctx context.Context) *Group {
 
 // FirstID returns the first Group ID from the query.
 // Returns a *NotFoundError when no Group ID was found.
-func (gq *GroupQuery) FirstID(ctx context.Context) (id schema.GroupId, err error) {
-	var ids []schema.GroupId
+func (gq *GroupQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = gq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -124,7 +124,7 @@ func (gq *GroupQuery) FirstID(ctx context.Context) (id schema.GroupId, err error
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (gq *GroupQuery) FirstIDX(ctx context.Context) schema.GroupId {
+func (gq *GroupQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := gq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -162,8 +162,8 @@ func (gq *GroupQuery) OnlyX(ctx context.Context) *Group {
 // OnlyID is like Only, but returns the only Group ID in the query.
 // Returns a *NotSingularError when more than one Group ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (gq *GroupQuery) OnlyID(ctx context.Context) (id schema.GroupId, err error) {
-	var ids []schema.GroupId
+func (gq *GroupQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = gq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -179,7 +179,7 @@ func (gq *GroupQuery) OnlyID(ctx context.Context) (id schema.GroupId, err error)
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (gq *GroupQuery) OnlyIDX(ctx context.Context) schema.GroupId {
+func (gq *GroupQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := gq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -205,8 +205,8 @@ func (gq *GroupQuery) AllX(ctx context.Context) []*Group {
 }
 
 // IDs executes the query and returns a list of Group IDs.
-func (gq *GroupQuery) IDs(ctx context.Context) ([]schema.GroupId, error) {
-	var ids []schema.GroupId
+func (gq *GroupQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := gq.Select(group.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -214,7 +214,7 @@ func (gq *GroupQuery) IDs(ctx context.Context) ([]schema.GroupId, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (gq *GroupQuery) IDsX(ctx context.Context) []schema.GroupId {
+func (gq *GroupQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := gq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -377,15 +377,15 @@ func (gq *GroupQuery) sqlAll(ctx context.Context) ([]*Group, error) {
 
 	if query := gq.withUsers; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[schema.GroupId]*Group, len(nodes))
+		ids := make(map[uuid.UUID]*Group, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Users = []*User{}
 		}
 		var (
-			edgeids []schema.UserId
-			edges   = make(map[schema.UserId][]*Group)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*Group)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -397,19 +397,19 @@ func (gq *GroupQuery) sqlAll(ctx context.Context) ([]*Group, error) {
 				s.Where(sql.InValues(group.UsersPrimaryKey[1], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullInt64)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := schema.GroupId(eout.Int64)
-				inValue := schema.UserId(ein.Int64)
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -466,7 +466,7 @@ func (gq *GroupQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   group.Table,
 			Columns: group.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: group.FieldID,
 			},
 		},

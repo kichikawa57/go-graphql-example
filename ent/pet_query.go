@@ -11,9 +11,9 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/pet"
 	"github.com/kichikawa/ent/predicate"
-	"github.com/kichikawa/ent/schema"
 )
 
 // PetQuery is the builder for querying Pet entities.
@@ -86,8 +86,8 @@ func (pq *PetQuery) FirstX(ctx context.Context) *Pet {
 
 // FirstID returns the first Pet ID from the query.
 // Returns a *NotFoundError when no Pet ID was found.
-func (pq *PetQuery) FirstID(ctx context.Context) (id schema.PetId, err error) {
-	var ids []schema.PetId
+func (pq *PetQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = pq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -99,7 +99,7 @@ func (pq *PetQuery) FirstID(ctx context.Context) (id schema.PetId, err error) {
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (pq *PetQuery) FirstIDX(ctx context.Context) schema.PetId {
+func (pq *PetQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := pq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -137,8 +137,8 @@ func (pq *PetQuery) OnlyX(ctx context.Context) *Pet {
 // OnlyID is like Only, but returns the only Pet ID in the query.
 // Returns a *NotSingularError when more than one Pet ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (pq *PetQuery) OnlyID(ctx context.Context) (id schema.PetId, err error) {
-	var ids []schema.PetId
+func (pq *PetQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = pq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -154,7 +154,7 @@ func (pq *PetQuery) OnlyID(ctx context.Context) (id schema.PetId, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (pq *PetQuery) OnlyIDX(ctx context.Context) schema.PetId {
+func (pq *PetQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := pq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -180,8 +180,8 @@ func (pq *PetQuery) AllX(ctx context.Context) []*Pet {
 }
 
 // IDs executes the query and returns a list of Pet IDs.
-func (pq *PetQuery) IDs(ctx context.Context) ([]schema.PetId, error) {
-	var ids []schema.PetId
+func (pq *PetQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := pq.Select(pet.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -189,7 +189,7 @@ func (pq *PetQuery) IDs(ctx context.Context) ([]schema.PetId, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (pq *PetQuery) IDsX(ctx context.Context) []schema.PetId {
+func (pq *PetQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := pq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -363,7 +363,7 @@ func (pq *PetQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   pet.Table,
 			Columns: pet.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: pet.FieldID,
 			},
 		},

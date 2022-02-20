@@ -12,10 +12,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/group"
 	"github.com/kichikawa/ent/pet"
 	"github.com/kichikawa/ent/predicate"
-	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -135,8 +135,8 @@ func (uq *UserQuery) FirstX(ctx context.Context) *User {
 
 // FirstID returns the first User ID from the query.
 // Returns a *NotFoundError when no User ID was found.
-func (uq *UserQuery) FirstID(ctx context.Context) (id schema.UserId, err error) {
-	var ids []schema.UserId
+func (uq *UserQuery) FirstID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = uq.Limit(1).IDs(ctx); err != nil {
 		return
 	}
@@ -148,7 +148,7 @@ func (uq *UserQuery) FirstID(ctx context.Context) (id schema.UserId, err error) 
 }
 
 // FirstIDX is like FirstID, but panics if an error occurs.
-func (uq *UserQuery) FirstIDX(ctx context.Context) schema.UserId {
+func (uq *UserQuery) FirstIDX(ctx context.Context) uuid.UUID {
 	id, err := uq.FirstID(ctx)
 	if err != nil && !IsNotFound(err) {
 		panic(err)
@@ -186,8 +186,8 @@ func (uq *UserQuery) OnlyX(ctx context.Context) *User {
 // OnlyID is like Only, but returns the only User ID in the query.
 // Returns a *NotSingularError when more than one User ID is found.
 // Returns a *NotFoundError when no entities are found.
-func (uq *UserQuery) OnlyID(ctx context.Context) (id schema.UserId, err error) {
-	var ids []schema.UserId
+func (uq *UserQuery) OnlyID(ctx context.Context) (id uuid.UUID, err error) {
+	var ids []uuid.UUID
 	if ids, err = uq.Limit(2).IDs(ctx); err != nil {
 		return
 	}
@@ -203,7 +203,7 @@ func (uq *UserQuery) OnlyID(ctx context.Context) (id schema.UserId, err error) {
 }
 
 // OnlyIDX is like OnlyID, but panics if an error occurs.
-func (uq *UserQuery) OnlyIDX(ctx context.Context) schema.UserId {
+func (uq *UserQuery) OnlyIDX(ctx context.Context) uuid.UUID {
 	id, err := uq.OnlyID(ctx)
 	if err != nil {
 		panic(err)
@@ -229,8 +229,8 @@ func (uq *UserQuery) AllX(ctx context.Context) []*User {
 }
 
 // IDs executes the query and returns a list of User IDs.
-func (uq *UserQuery) IDs(ctx context.Context) ([]schema.UserId, error) {
-	var ids []schema.UserId
+func (uq *UserQuery) IDs(ctx context.Context) ([]uuid.UUID, error) {
+	var ids []uuid.UUID
 	if err := uq.Select(user.FieldID).Scan(ctx, &ids); err != nil {
 		return nil, err
 	}
@@ -238,7 +238,7 @@ func (uq *UserQuery) IDs(ctx context.Context) ([]schema.UserId, error) {
 }
 
 // IDsX is like IDs, but panics if an error occurs.
-func (uq *UserQuery) IDsX(ctx context.Context) []schema.UserId {
+func (uq *UserQuery) IDsX(ctx context.Context) []uuid.UUID {
 	ids, err := uq.IDs(ctx)
 	if err != nil {
 		panic(err)
@@ -414,7 +414,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 
 	if query := uq.withPets; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[schema.UserId]*User)
+		nodeids := make(map[uuid.UUID]*User)
 		for i := range nodes {
 			fks = append(fks, nodes[i].ID)
 			nodeids[nodes[i].ID] = nodes[i]
@@ -443,15 +443,15 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 
 	if query := uq.withGroups; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[schema.UserId]*User, len(nodes))
+		ids := make(map[uuid.UUID]*User, len(nodes))
 		for _, node := range nodes {
 			ids[node.ID] = node
 			fks = append(fks, node.ID)
 			node.Edges.Groups = []*Group{}
 		}
 		var (
-			edgeids []schema.GroupId
-			edges   = make(map[schema.GroupId][]*User)
+			edgeids []uuid.UUID
+			edges   = make(map[uuid.UUID][]*User)
 		)
 		_spec := &sqlgraph.EdgeQuerySpec{
 			Edge: &sqlgraph.EdgeSpec{
@@ -463,19 +463,19 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 				s.Where(sql.InValues(user.GroupsPrimaryKey[0], fks...))
 			},
 			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(sql.NullInt64), new(sql.NullInt64)}
+				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
 			},
 			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*sql.NullInt64)
+				eout, ok := out.(*uuid.UUID)
 				if !ok || eout == nil {
 					return fmt.Errorf("unexpected id value for edge-out")
 				}
-				ein, ok := in.(*sql.NullInt64)
+				ein, ok := in.(*uuid.UUID)
 				if !ok || ein == nil {
 					return fmt.Errorf("unexpected id value for edge-in")
 				}
-				outValue := schema.UserId(eout.Int64)
-				inValue := schema.GroupId(ein.Int64)
+				outValue := *eout
+				inValue := *ein
 				node, ok := ids[outValue]
 				if !ok {
 					return fmt.Errorf("unexpected node id in edges: %v", outValue)
@@ -532,7 +532,7 @@ func (uq *UserQuery) querySpec() *sqlgraph.QuerySpec {
 			Table:   user.Table,
 			Columns: user.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: user.FieldID,
 			},
 		},

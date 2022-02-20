@@ -11,10 +11,10 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/group"
 	"github.com/kichikawa/ent/pet"
 	"github.com/kichikawa/ent/predicate"
-	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -77,14 +77,14 @@ func (uu *UserUpdate) ClearAge() *UserUpdate {
 }
 
 // AddPetIDs adds the "pets" edge to the Pet entity by IDs.
-func (uu *UserUpdate) AddPetIDs(ids ...schema.PetId) *UserUpdate {
+func (uu *UserUpdate) AddPetIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddPetIDs(ids...)
 	return uu
 }
 
 // AddPets adds the "pets" edges to the Pet entity.
 func (uu *UserUpdate) AddPets(p ...*Pet) *UserUpdate {
-	ids := make([]schema.PetId, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -92,14 +92,14 @@ func (uu *UserUpdate) AddPets(p ...*Pet) *UserUpdate {
 }
 
 // AddGroupIDs adds the "groups" edge to the Group entity by IDs.
-func (uu *UserUpdate) AddGroupIDs(ids ...schema.GroupId) *UserUpdate {
+func (uu *UserUpdate) AddGroupIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.AddGroupIDs(ids...)
 	return uu
 }
 
 // AddGroups adds the "groups" edges to the Group entity.
 func (uu *UserUpdate) AddGroups(g ...*Group) *UserUpdate {
-	ids := make([]schema.GroupId, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -118,14 +118,14 @@ func (uu *UserUpdate) ClearPets() *UserUpdate {
 }
 
 // RemovePetIDs removes the "pets" edge to Pet entities by IDs.
-func (uu *UserUpdate) RemovePetIDs(ids ...schema.PetId) *UserUpdate {
+func (uu *UserUpdate) RemovePetIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemovePetIDs(ids...)
 	return uu
 }
 
 // RemovePets removes "pets" edges to Pet entities.
 func (uu *UserUpdate) RemovePets(p ...*Pet) *UserUpdate {
-	ids := make([]schema.PetId, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -139,14 +139,14 @@ func (uu *UserUpdate) ClearGroups() *UserUpdate {
 }
 
 // RemoveGroupIDs removes the "groups" edge to Group entities by IDs.
-func (uu *UserUpdate) RemoveGroupIDs(ids ...schema.GroupId) *UserUpdate {
+func (uu *UserUpdate) RemoveGroupIDs(ids ...uuid.UUID) *UserUpdate {
 	uu.mutation.RemoveGroupIDs(ids...)
 	return uu
 }
 
 // RemoveGroups removes "groups" edges to Group entities.
 func (uu *UserUpdate) RemoveGroups(g ...*Group) *UserUpdate {
-	ids := make([]schema.GroupId, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -222,7 +222,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Table:   user.Table,
 			Columns: user.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: user.FieldID,
 			},
 		},
@@ -284,7 +284,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: pet.FieldID,
 				},
 			},
@@ -300,7 +300,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: pet.FieldID,
 				},
 			},
@@ -319,7 +319,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: pet.FieldID,
 				},
 			},
@@ -338,7 +338,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -354,7 +354,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -373,7 +373,7 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -448,14 +448,14 @@ func (uuo *UserUpdateOne) ClearAge() *UserUpdateOne {
 }
 
 // AddPetIDs adds the "pets" edge to the Pet entity by IDs.
-func (uuo *UserUpdateOne) AddPetIDs(ids ...schema.PetId) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddPetIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddPetIDs(ids...)
 	return uuo
 }
 
 // AddPets adds the "pets" edges to the Pet entity.
 func (uuo *UserUpdateOne) AddPets(p ...*Pet) *UserUpdateOne {
-	ids := make([]schema.PetId, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -463,14 +463,14 @@ func (uuo *UserUpdateOne) AddPets(p ...*Pet) *UserUpdateOne {
 }
 
 // AddGroupIDs adds the "groups" edge to the Group entity by IDs.
-func (uuo *UserUpdateOne) AddGroupIDs(ids ...schema.GroupId) *UserUpdateOne {
+func (uuo *UserUpdateOne) AddGroupIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.AddGroupIDs(ids...)
 	return uuo
 }
 
 // AddGroups adds the "groups" edges to the Group entity.
 func (uuo *UserUpdateOne) AddGroups(g ...*Group) *UserUpdateOne {
-	ids := make([]schema.GroupId, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -489,14 +489,14 @@ func (uuo *UserUpdateOne) ClearPets() *UserUpdateOne {
 }
 
 // RemovePetIDs removes the "pets" edge to Pet entities by IDs.
-func (uuo *UserUpdateOne) RemovePetIDs(ids ...schema.PetId) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemovePetIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemovePetIDs(ids...)
 	return uuo
 }
 
 // RemovePets removes "pets" edges to Pet entities.
 func (uuo *UserUpdateOne) RemovePets(p ...*Pet) *UserUpdateOne {
-	ids := make([]schema.PetId, len(p))
+	ids := make([]uuid.UUID, len(p))
 	for i := range p {
 		ids[i] = p[i].ID
 	}
@@ -510,14 +510,14 @@ func (uuo *UserUpdateOne) ClearGroups() *UserUpdateOne {
 }
 
 // RemoveGroupIDs removes the "groups" edge to Group entities by IDs.
-func (uuo *UserUpdateOne) RemoveGroupIDs(ids ...schema.GroupId) *UserUpdateOne {
+func (uuo *UserUpdateOne) RemoveGroupIDs(ids ...uuid.UUID) *UserUpdateOne {
 	uuo.mutation.RemoveGroupIDs(ids...)
 	return uuo
 }
 
 // RemoveGroups removes "groups" edges to Group entities.
 func (uuo *UserUpdateOne) RemoveGroups(g ...*Group) *UserUpdateOne {
-	ids := make([]schema.GroupId, len(g))
+	ids := make([]uuid.UUID, len(g))
 	for i := range g {
 		ids[i] = g[i].ID
 	}
@@ -600,7 +600,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Table:   user.Table,
 			Columns: user.Columns,
 			ID: &sqlgraph.FieldSpec{
-				Type:   field.TypeInt,
+				Type:   field.TypeUUID,
 				Column: user.FieldID,
 			},
 		},
@@ -679,7 +679,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: pet.FieldID,
 				},
 			},
@@ -695,7 +695,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: pet.FieldID,
 				},
 			},
@@ -714,7 +714,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: pet.FieldID,
 				},
 			},
@@ -733,7 +733,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -749,7 +749,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},
@@ -768,7 +768,7 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeInt,
+					Type:   field.TypeUUID,
 					Column: group.FieldID,
 				},
 			},

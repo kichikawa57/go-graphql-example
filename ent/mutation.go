@@ -9,10 +9,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/group"
 	"github.com/kichikawa/ent/pet"
 	"github.com/kichikawa/ent/predicate"
-	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/ent/user"
 
 	"entgo.io/ent"
@@ -37,12 +37,12 @@ type GroupMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *schema.GroupId
+	id            *uuid.UUID
 	unique_name   *string
 	name          *string
 	clearedFields map[string]struct{}
-	users         map[schema.UserId]struct{}
-	removedusers  map[schema.UserId]struct{}
+	users         map[uuid.UUID]struct{}
+	removedusers  map[uuid.UUID]struct{}
 	clearedusers  bool
 	done          bool
 	oldValue      func(context.Context) (*Group, error)
@@ -69,7 +69,7 @@ func newGroupMutation(c config, op Op, opts ...groupOption) *GroupMutation {
 }
 
 // withGroupID sets the ID field of the mutation.
-func withGroupID(id schema.GroupId) groupOption {
+func withGroupID(id uuid.UUID) groupOption {
 	return func(m *GroupMutation) {
 		var (
 			err   error
@@ -121,13 +121,13 @@ func (m GroupMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Group entities.
-func (m *GroupMutation) SetID(id schema.GroupId) {
+func (m *GroupMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *GroupMutation) ID() (id schema.GroupId, exists bool) {
+func (m *GroupMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -138,12 +138,12 @@ func (m *GroupMutation) ID() (id schema.GroupId, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *GroupMutation) IDs(ctx context.Context) ([]schema.GroupId, error) {
+func (m *GroupMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []schema.GroupId{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -226,9 +226,9 @@ func (m *GroupMutation) ResetName() {
 }
 
 // AddUserIDs adds the "users" edge to the User entity by ids.
-func (m *GroupMutation) AddUserIDs(ids ...schema.UserId) {
+func (m *GroupMutation) AddUserIDs(ids ...uuid.UUID) {
 	if m.users == nil {
-		m.users = make(map[schema.UserId]struct{})
+		m.users = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.users[ids[i]] = struct{}{}
@@ -246,9 +246,9 @@ func (m *GroupMutation) UsersCleared() bool {
 }
 
 // RemoveUserIDs removes the "users" edge to the User entity by IDs.
-func (m *GroupMutation) RemoveUserIDs(ids ...schema.UserId) {
+func (m *GroupMutation) RemoveUserIDs(ids ...uuid.UUID) {
 	if m.removedusers == nil {
-		m.removedusers = make(map[schema.UserId]struct{})
+		m.removedusers = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.users, ids[i])
@@ -257,7 +257,7 @@ func (m *GroupMutation) RemoveUserIDs(ids ...schema.UserId) {
 }
 
 // RemovedUsers returns the removed IDs of the "users" edge to the User entity.
-func (m *GroupMutation) RemovedUsersIDs() (ids []schema.UserId) {
+func (m *GroupMutation) RemovedUsersIDs() (ids []uuid.UUID) {
 	for id := range m.removedusers {
 		ids = append(ids, id)
 	}
@@ -265,7 +265,7 @@ func (m *GroupMutation) RemovedUsersIDs() (ids []schema.UserId) {
 }
 
 // UsersIDs returns the "users" edge IDs in the mutation.
-func (m *GroupMutation) UsersIDs() (ids []schema.UserId) {
+func (m *GroupMutation) UsersIDs() (ids []uuid.UUID) {
 	for id := range m.users {
 		ids = append(ids, id)
 	}
@@ -501,7 +501,7 @@ type PetMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *schema.PetId
+	id            *uuid.UUID
 	created_at    *time.Time
 	updated_at    *time.Time
 	name          *string
@@ -531,7 +531,7 @@ func newPetMutation(c config, op Op, opts ...petOption) *PetMutation {
 }
 
 // withPetID sets the ID field of the mutation.
-func withPetID(id schema.PetId) petOption {
+func withPetID(id uuid.UUID) petOption {
 	return func(m *PetMutation) {
 		var (
 			err   error
@@ -583,13 +583,13 @@ func (m PetMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of Pet entities.
-func (m *PetMutation) SetID(id schema.PetId) {
+func (m *PetMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *PetMutation) ID() (id schema.PetId, exists bool) {
+func (m *PetMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -600,12 +600,12 @@ func (m *PetMutation) ID() (id schema.PetId, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *PetMutation) IDs(ctx context.Context) ([]schema.PetId, error) {
+func (m *PetMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []schema.PetId{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -926,7 +926,7 @@ type UserMutation struct {
 	config
 	op            Op
 	typ           string
-	id            *schema.UserId
+	id            *uuid.UUID
 	created_at    *time.Time
 	updated_at    *time.Time
 	account_name  *string
@@ -934,11 +934,11 @@ type UserMutation struct {
 	age           *int
 	addage        *int
 	clearedFields map[string]struct{}
-	pets          map[schema.PetId]struct{}
-	removedpets   map[schema.PetId]struct{}
+	pets          map[uuid.UUID]struct{}
+	removedpets   map[uuid.UUID]struct{}
 	clearedpets   bool
-	groups        map[schema.GroupId]struct{}
-	removedgroups map[schema.GroupId]struct{}
+	groups        map[uuid.UUID]struct{}
+	removedgroups map[uuid.UUID]struct{}
 	clearedgroups bool
 	done          bool
 	oldValue      func(context.Context) (*User, error)
@@ -965,7 +965,7 @@ func newUserMutation(c config, op Op, opts ...userOption) *UserMutation {
 }
 
 // withUserID sets the ID field of the mutation.
-func withUserID(id schema.UserId) userOption {
+func withUserID(id uuid.UUID) userOption {
 	return func(m *UserMutation) {
 		var (
 			err   error
@@ -1017,13 +1017,13 @@ func (m UserMutation) Tx() (*Tx, error) {
 
 // SetID sets the value of the id field. Note that this
 // operation is only accepted on creation of User entities.
-func (m *UserMutation) SetID(id schema.UserId) {
+func (m *UserMutation) SetID(id uuid.UUID) {
 	m.id = &id
 }
 
 // ID returns the ID value in the mutation. Note that the ID is only available
 // if it was provided to the builder or after it was returned from the database.
-func (m *UserMutation) ID() (id schema.UserId, exists bool) {
+func (m *UserMutation) ID() (id uuid.UUID, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1034,12 +1034,12 @@ func (m *UserMutation) ID() (id schema.UserId, exists bool) {
 // That means, if the mutation is applied within a transaction with an isolation level such
 // as sql.LevelSerializable, the returned ids match the ids of the rows that will be updated
 // or updated by the mutation.
-func (m *UserMutation) IDs(ctx context.Context) ([]schema.UserId, error) {
+func (m *UserMutation) IDs(ctx context.Context) ([]uuid.UUID, error) {
 	switch {
 	case m.op.Is(OpUpdateOne | OpDeleteOne):
 		id, exists := m.ID()
 		if exists {
-			return []schema.UserId{id}, nil
+			return []uuid.UUID{id}, nil
 		}
 		fallthrough
 	case m.op.Is(OpUpdate | OpDelete):
@@ -1264,9 +1264,9 @@ func (m *UserMutation) ResetAge() {
 }
 
 // AddPetIDs adds the "pets" edge to the Pet entity by ids.
-func (m *UserMutation) AddPetIDs(ids ...schema.PetId) {
+func (m *UserMutation) AddPetIDs(ids ...uuid.UUID) {
 	if m.pets == nil {
-		m.pets = make(map[schema.PetId]struct{})
+		m.pets = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.pets[ids[i]] = struct{}{}
@@ -1284,9 +1284,9 @@ func (m *UserMutation) PetsCleared() bool {
 }
 
 // RemovePetIDs removes the "pets" edge to the Pet entity by IDs.
-func (m *UserMutation) RemovePetIDs(ids ...schema.PetId) {
+func (m *UserMutation) RemovePetIDs(ids ...uuid.UUID) {
 	if m.removedpets == nil {
-		m.removedpets = make(map[schema.PetId]struct{})
+		m.removedpets = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.pets, ids[i])
@@ -1295,7 +1295,7 @@ func (m *UserMutation) RemovePetIDs(ids ...schema.PetId) {
 }
 
 // RemovedPets returns the removed IDs of the "pets" edge to the Pet entity.
-func (m *UserMutation) RemovedPetsIDs() (ids []schema.PetId) {
+func (m *UserMutation) RemovedPetsIDs() (ids []uuid.UUID) {
 	for id := range m.removedpets {
 		ids = append(ids, id)
 	}
@@ -1303,7 +1303,7 @@ func (m *UserMutation) RemovedPetsIDs() (ids []schema.PetId) {
 }
 
 // PetsIDs returns the "pets" edge IDs in the mutation.
-func (m *UserMutation) PetsIDs() (ids []schema.PetId) {
+func (m *UserMutation) PetsIDs() (ids []uuid.UUID) {
 	for id := range m.pets {
 		ids = append(ids, id)
 	}
@@ -1318,9 +1318,9 @@ func (m *UserMutation) ResetPets() {
 }
 
 // AddGroupIDs adds the "groups" edge to the Group entity by ids.
-func (m *UserMutation) AddGroupIDs(ids ...schema.GroupId) {
+func (m *UserMutation) AddGroupIDs(ids ...uuid.UUID) {
 	if m.groups == nil {
-		m.groups = make(map[schema.GroupId]struct{})
+		m.groups = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		m.groups[ids[i]] = struct{}{}
@@ -1338,9 +1338,9 @@ func (m *UserMutation) GroupsCleared() bool {
 }
 
 // RemoveGroupIDs removes the "groups" edge to the Group entity by IDs.
-func (m *UserMutation) RemoveGroupIDs(ids ...schema.GroupId) {
+func (m *UserMutation) RemoveGroupIDs(ids ...uuid.UUID) {
 	if m.removedgroups == nil {
-		m.removedgroups = make(map[schema.GroupId]struct{})
+		m.removedgroups = make(map[uuid.UUID]struct{})
 	}
 	for i := range ids {
 		delete(m.groups, ids[i])
@@ -1349,7 +1349,7 @@ func (m *UserMutation) RemoveGroupIDs(ids ...schema.GroupId) {
 }
 
 // RemovedGroups returns the removed IDs of the "groups" edge to the Group entity.
-func (m *UserMutation) RemovedGroupsIDs() (ids []schema.GroupId) {
+func (m *UserMutation) RemovedGroupsIDs() (ids []uuid.UUID) {
 	for id := range m.removedgroups {
 		ids = append(ids, id)
 	}
@@ -1357,7 +1357,7 @@ func (m *UserMutation) RemovedGroupsIDs() (ids []schema.GroupId) {
 }
 
 // GroupsIDs returns the "groups" edge IDs in the mutation.
-func (m *UserMutation) GroupsIDs() (ids []schema.GroupId) {
+func (m *UserMutation) GroupsIDs() (ids []uuid.UUID) {
 	for id := range m.groups {
 		ids = append(ids, id)
 	}

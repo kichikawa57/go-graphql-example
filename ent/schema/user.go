@@ -5,11 +5,10 @@ import (
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 )
 
 // User holds the schema definition for the User entity.
-type UserId int
-
 type User struct {
 	ent.Schema
 }
@@ -23,7 +22,8 @@ func (User) Mixin() []ent.Mixin {
 // Fields of the User.
 func (User) Fields() []ent.Field {
 	return []ent.Field{
-		field.Int("id").GoType(UserId(0)),
+		field.UUID("id", uuid.UUID{}).
+			Default(uuid.New),
 		field.String("account_name").Unique(),
 		field.String("email").
 			SchemaType(map[string]string{
