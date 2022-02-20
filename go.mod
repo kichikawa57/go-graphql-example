@@ -4,10 +4,17 @@ go 1.18
 
 require (
 	entgo.io/ent v0.10.1-0.20220204204617-770e4d24e9b1
+	github.com/99designs/gqlgen v0.16.0
 	github.com/gin-gonic/gin v1.7.7
+	github.com/vektah/gqlparser/v2 v2.3.1
 )
 
-require github.com/sergi/go-diff v1.1.0 // indirect
+require (
+	github.com/agnivade/levenshtein v1.1.1 // indirect
+	github.com/gorilla/websocket v1.4.2 // indirect
+	github.com/hashicorp/golang-lru v0.5.1 // indirect
+	github.com/mitchellh/mapstructure v1.4.3 // indirect
+)
 
 require (
 	cloud.google.com/go v0.100.2 // indirect
@@ -39,7 +46,7 @@ require (
 	github.com/go-playground/validator/v10 v10.10.0 // indirect
 	github.com/golang/protobuf v1.5.2 // indirect
 	github.com/google/go-cmp v0.5.7 // indirect
-	github.com/google/uuid v1.3.0 // indirect
+	github.com/google/uuid v1.3.0
 	github.com/hashicorp/hcl/v2 v2.11.1 // indirect
 	github.com/json-iterator/go v1.1.12 // indirect
 	github.com/leodido/go-urn v1.2.1 // indirect
@@ -52,7 +59,7 @@ require (
 	github.com/zclconf/go-cty v1.10.0 // indirect
 	golang.org/x/crypto v0.0.0-20220131195533-30dcbda58838 // indirect
 	golang.org/x/mod v0.5.1 // indirect
-	golang.org/x/sys v0.0.0-20220204135822-1c1b9b1eba6a // indirect
+	golang.org/x/sys v0.0.0-20220209214540-3681064d5158 // indirect
 	golang.org/x/text v0.3.7 // indirect
 	google.golang.org/protobuf v1.27.1 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
