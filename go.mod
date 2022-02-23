@@ -12,7 +12,6 @@ require (
 require (
 	github.com/agnivade/levenshtein v1.1.1 // indirect
 	github.com/gorilla/websocket v1.4.2 // indirect
-	github.com/hashicorp/golang-lru v0.5.1 // indirect
 	github.com/mitchellh/mapstructure v1.4.3 // indirect
 )
 
