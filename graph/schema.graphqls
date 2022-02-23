@@ -2,15 +2,30 @@
 #
 # https://gqlgen.com/getting-started/
 
+scalar TodoId
+scalar UserId
+scalar Date
+scalar Upload
+scalar UUID
+
+enum Signal {
+  RED
+  YELLOW
+  GREEN
+}
+
+
 type Todo {
-  id: ID!
-  text: String!
+  id: TodoId!
+  text: Upload!
   done: Boolean!
+  dones: Boolean!
   user: User!
+  createdAt: Date
 }
 
 type User {
-  id: ID!
+  id: UserId!
   name: String!
 }
 
@@ -20,7 +35,7 @@ type Query {
 
 input NewTodo {
   text: String!
-  userId: String!
+  userId: UserId!
 }
 
 type Mutation {

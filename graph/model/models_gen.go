@@ -2,19 +2,72 @@
 
 package model
 
+import (
+	"fmt"
+	"io"
+	"strconv"
+
+	"github.com/99designs/gqlgen/graphql"
+)
+
 type NewTodo struct {
 	Text   string `json:"text"`
-	UserID string `json:"userId"`
+	UserID UserId `json:"userId"`
 }
 
 type Todo struct {
-	ID   string `json:"id"`
-	Text string `json:"text"`
-	Done bool   `json:"done"`
-	User *User  `json:"user"`
+	ID        TodoId         `json:"id"`
+	Text      graphql.Upload `json:"text"`
+	Done      bool           `json:"done"`
+	Dones     bool           `json:"dones"`
+	User      *User          `json:"user"`
+	CreatedAt *string        `json:"createdAt"`
 }
 
 type User struct {
-	ID   string `json:"id"`
+	ID   UserId `json:"id"`
 	Name string `json:"name"`
+}
+
+type Signal string
+
+const (
+	SignalRed    Signal = "RED"
+	SignalYellow Signal = "YELLOW"
+	SignalGreen  Signal = "GREEN"
+)
+
+var AllSignal = []Signal{
+	SignalRed,
+	SignalYellow,
+	SignalGreen,
+}
+
+func (e Signal) IsValid() bool {
+	switch e {
+	case SignalRed, SignalYellow, SignalGreen:
+		return true
+	}
+	return false
+}
+
+func (e Signal) String() string {
+	return string(e)
+}
+
+func (e *Signal) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = Signal(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid Signal", str)
+	}
+	return nil
+}
+
+func (e Signal) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
 }
