@@ -67,5 +67,5 @@ func main() {
 	// logger.Info("mail: ", res)
 
 	r := router.SetupRouter()
-	r.Run("8080")
+	r.Run(":8080")
 }

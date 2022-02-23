@@ -1,4 +1,4 @@
-FROM golang:1.18beta2-alpine as dev
+FROM golang:1.17-alpine as dev
 
 ENV ROOT=/go/src/github.com/kichikawa
 ENV PATH /usr/local/go/bin:$PATH

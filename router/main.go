@@ -1,6 +1,8 @@
 package router
 
 import (
+	"fmt"
+
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/kichikawa/graph"
@@ -11,13 +13,14 @@ func graphqlHandler() gin.HandlerFunc {
 	h := handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
 
 	return func(c *gin.Context) {
+		fmt.Println("tets")
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }
 
 // Defining the Playground handler
 func playgroundHandler() gin.HandlerFunc {
-	h := handler.Playground("GraphQL", "/query")
+	h := handler.Playground("GraphQL playground", "/query")
 
 	return func(c *gin.Context) {
 		h.ServeHTTP(c.Writer, c.Request)
@@ -27,6 +30,7 @@ func playgroundHandler() gin.HandlerFunc {
 func SetupRouter() *gin.Engine {
 
 	r := gin.Default()
+
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{
 			"message": "pong",
