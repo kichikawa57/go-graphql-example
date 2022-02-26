@@ -2,18 +2,31 @@ package router
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
+	"github.com/kichikawa/ent"
 	"github.com/kichikawa/graph"
 	"github.com/kichikawa/graph/generated"
 )
 
 func graphqlHandler() gin.HandlerFunc {
-	h := handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{}}))
+
+	fmt.Println("tets")
 
 	return func(c *gin.Context) {
-		fmt.Println("tets")
+		client, err := ent.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=disable",
+			"db", "5432", "postgres", "development", "password"))
+
+		if err != nil {
+			log.Fatalf("failed opening connection to postgres: %v", err)
+		}
+
+		h := handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+			Client: client,
+		}}))
+
 		h.ServeHTTP(c.Writer, c.Request)
 	}
 }

@@ -49,6 +49,7 @@ var (
 		{Name: "updated_at", Type: field.TypeTime},
 		{Name: "account_name", Type: field.TypeString, Unique: true},
 		{Name: "email", Type: field.TypeString, Unique: true, SchemaType: map[string]string{"postgres": "varchar(30)"}},
+		{Name: "status", Type: field.TypeEnum, Enums: []string{"IN_PROGRESS", "COMPLETED"}},
 		{Name: "age", Type: field.TypeInt, Nullable: true, SchemaType: map[string]string{"postgres": "int"}},
 	}
 	// UsersTable holds the schema information for the "users" table.

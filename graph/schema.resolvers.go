@@ -16,16 +16,36 @@ func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) 
 	panic(fmt.Errorf("not implemented"))
 }
 
-func (r *queryResolver) Todos(ctx context.Context) ([]*model.Todo, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) Todos(ctx context.Context) (*ent.Pet, error) {
+	users, usersErr := r.Client.User.Query().All(ctx)
+
+	if usersErr != nil {
+		fmt.Println("usersErr =====================>", usersErr)
+
+		return nil, usersErr
+	}
+
+	fmt.Println("users =====================>", len(users))
+
+	return &ent.Pet{Name: "test"}, nil
 }
 
-func (r *userResolver) ID(ctx context.Context, obj *ent.User) (model.UserId, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *queryResolver) GetUserList(ctx context.Context) ([]*ent.User, error) {
+	users, usersErr := r.Client.User.Query().All(ctx)
+
+	if usersErr != nil {
+		return nil, usersErr
+	}
+
+	return users, nil
 }
 
-func (r *userResolver) Name(ctx context.Context, obj *ent.User) (string, error) {
-	panic(fmt.Errorf("not implemented"))
+func (r *userResolver) ID(ctx context.Context, obj *ent.User) (model.UUID, error) {
+	return model.UUID(obj.ID), nil
+}
+
+func (r *userResolver) Status(ctx context.Context, obj *ent.User) (model.UserStatus, error) {
+	return model.UserStatus(string(obj.Status)), nil
 }
 
 // Mutation returns generated.MutationResolver implementation.

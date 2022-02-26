@@ -21,21 +21,52 @@ type Todo {
   done: Boolean!
   dones: Boolean!
   user: User!
+  pet: Pet!
   createdAt: Date
 }
 
+enum UserStatus {
+  IN_PROGRESS
+  COMPLETED
+}
+
 type User {
-  id: UserId!
+  id: UUID!
+  email: String!
+  status: UserStatus!
+}
+
+type Pet {
   name: String!
 }
 
-type Query {
-  todos: [Todo!]!
+
+enum OrderDirection {
+  ASC
+  DESC
+}
+
+enum UserOrderField {
+  CREATED_AT
+  PRIORITY
+  STATUS
+  TEXT
 }
 
 input NewTodo {
   text: String!
   userId: UserId!
+}
+
+input UserOrder {
+  direction: OrderDirection!
+  field: UserOrderField
+}
+
+
+type Query {
+  todos: Pet
+  getUserList: [User!]!
 }
 
 type Mutation {

@@ -8,9 +8,7 @@ import (
 	"github.com/google/uuid"
 )
 
-type UUID struct {
-	string
-}
+type UUID uuid.UUID
 
 // UnmarshalGQL implements the graphql.Unmarshaler interface
 func (u *UUID) UnmarshalGQL(v interface{}) error {
@@ -23,12 +21,19 @@ func (u *UUID) UnmarshalGQL(v interface{}) error {
 		return fmt.Errorf("not in uuid format: %w", err)
 	}
 
-	u.string = str
-
 	return nil
 }
 
 // MarshalGQL implements the graphql.Marshaler interface
 func (u UUID) MarshalGQL(w io.Writer) {
-	_, _ = io.WriteString(w, strconv.Quote(u.string))
+	uuid, _ := uuid.FromBytes(Bytes(u))
+	_, _ = io.WriteString(w, strconv.Quote(uuid.String()))
+}
+
+func Bytes(bytes [16]byte) []byte {
+	strs := []byte{}
+	for _, b := range bytes {
+		strs = append(strs, b)
+	}
+	return strs
 }

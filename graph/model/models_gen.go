@@ -22,6 +22,7 @@ type Todo struct {
 	Done      bool           `json:"done"`
 	Dones     bool           `json:"dones"`
 	User      *ent.User      `json:"user"`
+	Pet       *ent.Pet       `json:"pet"`
 	CreatedAt *string        `json:"createdAt"`
 }
 
@@ -65,5 +66,46 @@ func (e *Signal) UnmarshalGQL(v interface{}) error {
 }
 
 func (e Signal) MarshalGQL(w io.Writer) {
+	fmt.Fprint(w, strconv.Quote(e.String()))
+}
+
+type UserStatus string
+
+const (
+	UserStatusInProgress UserStatus = "IN_PROGRESS"
+	UserStatusCompleted  UserStatus = "COMPLETED"
+)
+
+var AllUserStatus = []UserStatus{
+	UserStatusInProgress,
+	UserStatusCompleted,
+}
+
+func (e UserStatus) IsValid() bool {
+	switch e {
+	case UserStatusInProgress, UserStatusCompleted:
+		return true
+	}
+	return false
+}
+
+func (e UserStatus) String() string {
+	return string(e)
+}
+
+func (e *UserStatus) UnmarshalGQL(v interface{}) error {
+	str, ok := v.(string)
+	if !ok {
+		return fmt.Errorf("enums must be strings")
+	}
+
+	*e = UserStatus(str)
+	if !e.IsValid() {
+		return fmt.Errorf("%s is not a valid UserStatus", str)
+	}
+	return nil
+}
+
+func (e UserStatus) MarshalGQL(w io.Writer) {
 	fmt.Fprint(w, strconv.Quote(e.String()))
 }

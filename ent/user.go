@@ -25,6 +25,8 @@ type User struct {
 	AccountName string `json:"account_name,omitempty"`
 	// Email holds the value of the "email" field.
 	Email string `json:"email,omitempty"`
+	// Status holds the value of the "status" field.
+	Status user.Status `json:"status,omitempty"`
 	// Age holds the value of the "age" field.
 	Age int `json:"age,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
@@ -68,7 +70,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldAge:
 			values[i] = new(sql.NullInt64)
-		case user.FieldAccountName, user.FieldEmail:
+		case user.FieldAccountName, user.FieldEmail, user.FieldStatus:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -118,6 +120,12 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
 				u.Email = value.String
+			}
+		case user.FieldStatus:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field status", values[i])
+			} else if value.Valid {
+				u.Status = user.Status(value.String)
 			}
 		case user.FieldAge:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -171,6 +179,8 @@ func (u *User) String() string {
 	builder.WriteString(u.AccountName)
 	builder.WriteString(", email=")
 	builder.WriteString(u.Email)
+	builder.WriteString(", status=")
+	builder.WriteString(fmt.Sprintf("%v", u.Status))
 	builder.WriteString(", age=")
 	builder.WriteString(fmt.Sprintf("%v", u.Age))
 	builder.WriteByte(')')

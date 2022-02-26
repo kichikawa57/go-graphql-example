@@ -45,6 +45,7 @@ func main() {
 	// 	SetAge(10).
 	// 	SetEmail("test@attivita.co.jp").
 	// 	SetAccountName("testA").
+	// 	SetStatus(user.StatusInProgress).
 	// 	Save(ctx); err != nil {
 	// 	log.Fatalf("エラーだよ ===============>", err)
 	// }

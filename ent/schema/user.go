@@ -1,6 +1,7 @@
 package schema
 
 import (
+	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
@@ -30,6 +31,14 @@ func (User) Fields() []ent.Field {
 				dialect.Postgres: "varchar(30)",
 			}).
 			Unique(),
+		field.Enum("status").
+			NamedValues(
+				"InProgress", "IN_PROGRESS",
+				"Completed", "COMPLETED",
+			).
+			Annotations(
+				entgql.OrderField("STATUS"),
+			),
 		field.Int("age").
 			SchemaType(map[string]string{
 				dialect.Postgres: "int",

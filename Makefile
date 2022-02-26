@@ -59,3 +59,7 @@ schema-add:
 .PHONY: schema-gen
 schema-gen:
 	docker exec api go generate ./...
+
+.PHONY: gqlgen
+gqlgen:
+	docker exec api gqlgen
