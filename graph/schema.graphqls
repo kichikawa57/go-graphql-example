@@ -31,7 +31,7 @@ enum UserStatus {
 }
 
 type User {
-  id: UUID!
+  id: UserId!
   email: String!
   status: UserStatus!
 }

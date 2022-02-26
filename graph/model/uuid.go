@@ -6,6 +6,7 @@ import (
 	"strconv"
 
 	"github.com/google/uuid"
+	"github.com/kichikawa/shared"
 )
 
 type UUID uuid.UUID
@@ -26,14 +27,5 @@ func (u *UUID) UnmarshalGQL(v interface{}) error {
 
 // MarshalGQL implements the graphql.Marshaler interface
 func (u UUID) MarshalGQL(w io.Writer) {
-	uuid, _ := uuid.FromBytes(Bytes(u))
-	_, _ = io.WriteString(w, strconv.Quote(uuid.String()))
-}
-
-func Bytes(bytes [16]byte) []byte {
-	strs := []byte{}
-	for _, b := range bytes {
-		strs = append(strs, b)
-	}
-	return strs
+	_, _ = io.WriteString(w, strconv.Quote(shared.ConvertUUIDToString(uuid.UUID(u))))
 }

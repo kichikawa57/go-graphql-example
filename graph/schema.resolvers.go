@@ -40,8 +40,8 @@ func (r *queryResolver) GetUserList(ctx context.Context) ([]*ent.User, error) {
 	return users, nil
 }
 
-func (r *userResolver) ID(ctx context.Context, obj *ent.User) (model.UUID, error) {
-	return model.UUID(obj.ID), nil
+func (r *userResolver) ID(ctx context.Context, obj *ent.User) (model.UserId, error) {
+	return model.UserId(obj.ID), nil
 }
 
 func (r *userResolver) Status(ctx context.Context, obj *ent.User) (model.UserStatus, error) {

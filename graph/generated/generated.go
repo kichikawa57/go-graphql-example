@@ -83,7 +83,7 @@ type QueryResolver interface {
 	GetUserList(ctx context.Context) ([]*ent.User, error)
 }
 type UserResolver interface {
-	ID(ctx context.Context, obj *ent.User) (model.UUID, error)
+	ID(ctx context.Context, obj *ent.User) (model.UserId, error)
 
 	Status(ctx context.Context, obj *ent.User) (model.UserStatus, error)
 }
@@ -303,7 +303,7 @@ enum UserStatus {
 }
 
 type User {
-  id: UUID!
+  id: UserId!
   email: String!
   status: UserStatus!
 }
@@ -922,9 +922,9 @@ func (ec *executionContext) _User_id(ctx context.Context, field graphql.Collecte
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.UUID)
+	res := resTmp.(model.UserId)
 	fc.Result = res
-	return ec.marshalNUUID2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUUID(ctx, field.Selections, res)
+	return ec.marshalNUserId2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserId(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_email(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
@@ -3007,16 +3007,6 @@ func (ec *executionContext) marshalNTodoId2githubᚗcomᚋkichikawaᚋgraphᚋmo
 	return res
 }
 
-func (ec *executionContext) unmarshalNUUID2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUUID(ctx context.Context, v interface{}) (model.UUID, error) {
-	var res model.UUID
-	err := res.UnmarshalGQL(v)
-	return res, graphql.ErrorOnPath(ctx, err)
-}
-
-func (ec *executionContext) marshalNUUID2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUUID(ctx context.Context, sel ast.SelectionSet, v model.UUID) graphql.Marshaler {
-	return v
-}
-
 func (ec *executionContext) unmarshalNUpload2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚐUpload(ctx context.Context, v interface{}) (graphql.Upload, error) {
 	res, err := graphql.UnmarshalUpload(v)
 	return res, graphql.ErrorOnPath(ctx, err)
@@ -3087,19 +3077,13 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋkichikawaᚋentᚐUse
 }
 
 func (ec *executionContext) unmarshalNUserId2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserId(ctx context.Context, v interface{}) (model.UserId, error) {
-	tmp, err := graphql.UnmarshalString(v)
-	res := model.UserId(tmp)
+	var res model.UserId
+	err := res.UnmarshalGQL(v)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
 func (ec *executionContext) marshalNUserId2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserId(ctx context.Context, sel ast.SelectionSet, v model.UserId) graphql.Marshaler {
-	res := graphql.MarshalString(string(v))
-	if res == graphql.Null {
-		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
-			ec.Errorf(ctx, "must not be null")
-		}
-	}
-	return res
+	return v
 }
 
 func (ec *executionContext) unmarshalNUserStatus2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserStatus(ctx context.Context, v interface{}) (model.UserStatus, error) {
