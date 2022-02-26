@@ -8,6 +8,7 @@ import (
 	"strconv"
 
 	"github.com/99designs/gqlgen/graphql"
+	"github.com/kichikawa/ent"
 )
 
 type NewTodo struct {
@@ -20,13 +21,8 @@ type Todo struct {
 	Text      graphql.Upload `json:"text"`
 	Done      bool           `json:"done"`
 	Dones     bool           `json:"dones"`
-	User      *User          `json:"user"`
+	User      *ent.User      `json:"user"`
 	CreatedAt *string        `json:"createdAt"`
-}
-
-type User struct {
-	ID   UserId `json:"id"`
-	Name string `json:"name"`
 }
 
 type Signal string

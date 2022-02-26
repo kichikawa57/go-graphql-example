@@ -35,8 +35,8 @@ resolver:
 
 # gqlgen will search for any type names in the schema in these go packages
 # if they match it will use them, otherwise it will generate them.
-# autobind:
-#   - "github.com/kichikawa/graph/model"
+autobind:
+  - github.com/kichikawa/ent
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -61,3 +61,7 @@ models:
     model: github.com/kichikawa/graph/model.TodoId
   UserId:
     model: github.com/kichikawa/graph/model.UserId
+  Node:
+    model:
+      # ent.Noderは、Nodeテンプレートが生成する新しいインターフェースである
+      - github.com/kichikawa/ent.Noder
