@@ -11,8 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/kichikawa/ent/group"
-	"github.com/kichikawa/ent/pet"
+	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -58,8 +57,8 @@ func (uc *UserCreate) SetAccountName(s string) *UserCreate {
 }
 
 // SetEmail sets the "email" field.
-func (uc *UserCreate) SetEmail(s string) *UserCreate {
-	uc.mutation.SetEmail(s)
+func (uc *UserCreate) SetEmail(se schema.UserEmail) *UserCreate {
+	uc.mutation.SetEmail(se)
 	return uc
 }
 
@@ -95,36 +94,6 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 		uc.SetID(*u)
 	}
 	return uc
-}
-
-// AddPetIDs adds the "pets" edge to the Pet entity by IDs.
-func (uc *UserCreate) AddPetIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddPetIDs(ids...)
-	return uc
-}
-
-// AddPets adds the "pets" edges to the Pet entity.
-func (uc *UserCreate) AddPets(p ...*Pet) *UserCreate {
-	ids := make([]uuid.UUID, len(p))
-	for i := range p {
-		ids[i] = p[i].ID
-	}
-	return uc.AddPetIDs(ids...)
-}
-
-// AddGroupIDs adds the "groups" edge to the Group entity by IDs.
-func (uc *UserCreate) AddGroupIDs(ids ...uuid.UUID) *UserCreate {
-	uc.mutation.AddGroupIDs(ids...)
-	return uc
-}
-
-// AddGroups adds the "groups" edges to the Group entity.
-func (uc *UserCreate) AddGroups(g ...*Group) *UserCreate {
-	ids := make([]uuid.UUID, len(g))
-	for i := range g {
-		ids[i] = g[i].ID
-	}
-	return uc.AddGroupIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -317,44 +286,6 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldAge,
 		})
 		_node.Age = value
-	}
-	if nodes := uc.mutation.PetsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.O2M,
-			Inverse: false,
-			Table:   user.PetsTable,
-			Columns: []string{user.PetsColumn},
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: pet.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
-	}
-	if nodes := uc.mutation.GroupsIDs(); len(nodes) > 0 {
-		edge := &sqlgraph.EdgeSpec{
-			Rel:     sqlgraph.M2M,
-			Inverse: false,
-			Table:   user.GroupsTable,
-			Columns: user.GroupsPrimaryKey,
-			Bidi:    false,
-			Target: &sqlgraph.EdgeTarget{
-				IDSpec: &sqlgraph.FieldSpec{
-					Type:   field.TypeUUID,
-					Column: group.FieldID,
-				},
-			},
-		}
-		for _, k := range nodes {
-			edge.Target.Nodes = append(edge.Target.Nodes, k)
-		}
-		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

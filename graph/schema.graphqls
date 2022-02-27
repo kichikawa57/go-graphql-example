@@ -2,28 +2,10 @@
 #
 # https://gqlgen.com/getting-started/
 
-scalar TodoId
-scalar UserId
-scalar Date
-scalar Upload
 scalar UUID
+scalar Date
 
-enum Signal {
-  RED
-  YELLOW
-  GREEN
-}
-
-
-type Todo {
-  id: TodoId!
-  text: Upload!
-  done: Boolean!
-  dones: Boolean!
-  user: User!
-  pet: Pet!
-  createdAt: Date
-}
+scalar UserEmail
 
 enum UserStatus {
   IN_PROGRESS
@@ -31,44 +13,22 @@ enum UserStatus {
 }
 
 type User {
-  id: UserId!
-  email: String!
+  id: UUID!
+  email: UserEmail!
   status: UserStatus!
+  age: Int!
 }
 
-type Pet {
-  name: String!
+input CreateUserInput {
+  email: UserEmail!
+  status: UserStatus!
+  age: Int!
 }
-
-
-enum OrderDirection {
-  ASC
-  DESC
-}
-
-enum UserOrderField {
-  CREATED_AT
-  PRIORITY
-  STATUS
-  TEXT
-}
-
-input NewTodo {
-  text: String!
-  userId: UserId!
-}
-
-input UserOrder {
-  direction: OrderDirection!
-  field: UserOrderField
-}
-
 
 type Query {
-  todos: Pet
   getUserList: [User!]!
 }
 
 type Mutation {
-  createTodo(input: NewTodo!): Todo!
+  createUser(input: CreateUserInput!): User!
 }

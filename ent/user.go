@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
+	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -24,43 +25,11 @@ type User struct {
 	// AccountName holds the value of the "account_name" field.
 	AccountName string `json:"account_name,omitempty"`
 	// Email holds the value of the "email" field.
-	Email string `json:"email,omitempty"`
+	Email schema.UserEmail `json:"email,omitempty"`
 	// Status holds the value of the "status" field.
 	Status user.Status `json:"status,omitempty"`
 	// Age holds the value of the "age" field.
 	Age int `json:"age,omitempty"`
-	// Edges holds the relations/edges for other nodes in the graph.
-	// The values are being populated by the UserQuery when eager-loading is set.
-	Edges UserEdges `json:"edges"`
-}
-
-// UserEdges holds the relations/edges for other nodes in the graph.
-type UserEdges struct {
-	// Pets holds the value of the pets edge.
-	Pets []*Pet `json:"pets,omitempty"`
-	// Groups holds the value of the groups edge.
-	Groups []*Group `json:"groups,omitempty"`
-	// loadedTypes holds the information for reporting if a
-	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
-}
-
-// PetsOrErr returns the Pets value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) PetsOrErr() ([]*Pet, error) {
-	if e.loadedTypes[0] {
-		return e.Pets, nil
-	}
-	return nil, &NotLoadedError{edge: "pets"}
-}
-
-// GroupsOrErr returns the Groups value or an error if the edge
-// was not loaded in eager-loading.
-func (e UserEdges) GroupsOrErr() ([]*Group, error) {
-	if e.loadedTypes[1] {
-		return e.Groups, nil
-	}
-	return nil, &NotLoadedError{edge: "groups"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -119,7 +88,7 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				u.Email = value.String
+				u.Email = schema.UserEmail(value.String)
 			}
 		case user.FieldStatus:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -136,16 +105,6 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
-}
-
-// QueryPets queries the "pets" edge of the User entity.
-func (u *User) QueryPets() *PetQuery {
-	return (&UserClient{config: u.config}).QueryPets(u)
-}
-
-// QueryGroups queries the "groups" edge of the User entity.
-func (u *User) QueryGroups() *GroupQuery {
-	return (&UserClient{config: u.config}).QueryGroups(u)
 }
 
 // Update returns a builder for updating this User.
@@ -178,7 +137,7 @@ func (u *User) String() string {
 	builder.WriteString(", account_name=")
 	builder.WriteString(u.AccountName)
 	builder.WriteString(", email=")
-	builder.WriteString(u.Email)
+	builder.WriteString(fmt.Sprintf("%v", u.Email))
 	builder.WriteString(", status=")
 	builder.WriteString(fmt.Sprintf("%v", u.Status))
 	builder.WriteString(", age=")

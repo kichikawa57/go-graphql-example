@@ -8,26 +8,13 @@ import (
 	"fmt"
 
 	"github.com/kichikawa/ent"
+	"github.com/kichikawa/ent/schema"
 	"github.com/kichikawa/graph/generated"
 	"github.com/kichikawa/graph/model"
 )
 
-func (r *mutationResolver) CreateTodo(ctx context.Context, input model.NewTodo) (*model.Todo, error) {
+func (r *mutationResolver) CreateUser(ctx context.Context, input model.CreateUserInput) (*ent.User, error) {
 	panic(fmt.Errorf("not implemented"))
-}
-
-func (r *queryResolver) Todos(ctx context.Context) (*ent.Pet, error) {
-	users, usersErr := r.Client.User.Query().All(ctx)
-
-	if usersErr != nil {
-		fmt.Println("usersErr =====================>", usersErr)
-
-		return nil, usersErr
-	}
-
-	fmt.Println("users =====================>", len(users))
-
-	return &ent.Pet{Name: "test"}, nil
 }
 
 func (r *queryResolver) GetUserList(ctx context.Context) ([]*ent.User, error) {
@@ -40,8 +27,8 @@ func (r *queryResolver) GetUserList(ctx context.Context) ([]*ent.User, error) {
 	return users, nil
 }
 
-func (r *userResolver) ID(ctx context.Context, obj *ent.User) (model.UserId, error) {
-	return model.UserId(obj.ID), nil
+func (r *userResolver) ID(ctx context.Context, obj *ent.User) (model.UUID, error) {
+	return model.UUID(obj.ID), nil
 }
 
 func (r *userResolver) Status(ctx context.Context, obj *ent.User) (model.UserStatus, error) {
@@ -60,3 +47,13 @@ func (r *Resolver) User() generated.UserResolver { return &userResolver{r} }
 type mutationResolver struct{ *Resolver }
 type queryResolver struct{ *Resolver }
 type userResolver struct{ *Resolver }
+
+// !!! WARNING !!!
+// The code below was going to be deleted when updating resolvers. It has been copied here so you have
+// one last chance to move it out of harms way if you want. There are two reasons this happens:
+//  - When renaming or deleting a resolver the old code will be put in here. You can safely delete
+//    it when you're done.
+//  - You have helper methods in this file. Move them out to keep these resolver files clean.
+func (r *queryResolver) GetUserEmails(ctx context.Context) ([]schema.UserEmail, error) {
+	panic(fmt.Errorf("not implemented"))
+}

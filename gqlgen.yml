@@ -37,6 +37,7 @@ resolver:
 # if they match it will use them, otherwise it will generate them.
 autobind:
   - github.com/kichikawa/ent
+  - github.com/kichikawa/ent/schema
 
 # This section declares type mapping between the GraphQL and go type systems
 #
@@ -57,10 +58,6 @@ models:
       - github.com/99designs/gqlgen/graphql.Int32
   UUID:
     model: github.com/kichikawa/graph/model.UUID
-  TodoId:
-    model: github.com/kichikawa/graph/model.TodoId
-  UserId:
-    model: github.com/kichikawa/graph/model.UserId
   Node:
     model:
       # ent.Noderは、Nodeテンプレートが生成する新しいインターフェースである

@@ -4,7 +4,6 @@ import (
 	"entgo.io/contrib/entgql"
 	"entgo.io/ent"
 	"entgo.io/ent/dialect"
-	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
 )
@@ -13,6 +12,8 @@ import (
 type User struct {
 	ent.Schema
 }
+
+type UserEmail string
 
 func (User) Mixin() []ent.Mixin {
 	return []ent.Mixin{
@@ -30,6 +31,7 @@ func (User) Fields() []ent.Field {
 			SchemaType(map[string]string{
 				dialect.Postgres: "varchar(30)",
 			}).
+			GoType(UserEmail("")).
 			Unique(),
 		field.Enum("status").
 			NamedValues(
@@ -49,9 +51,5 @@ func (User) Fields() []ent.Field {
 
 // Edges of the User.
 func (User) Edges() []ent.Edge {
-	return []ent.Edge{
-		edge.To("pets", Pet.Type).
-			StorageKey(edge.Column("user_id")),
-		edge.To("groups", Group.Type),
-	}
+	return []ent.Edge{}
 }

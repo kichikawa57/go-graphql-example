@@ -11,8 +11,6 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-multierror"
-	"github.com/kichikawa/ent/group"
-	"github.com/kichikawa/ent/pet"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -43,84 +41,12 @@ type Edge struct {
 	IDs  []uuid.UUID `json:"ids,omitempty"`  // node ids (where this edge point to).
 }
 
-func (gr *Group) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     gr.ID,
-		Type:   "Group",
-		Fields: make([]*Field, 2),
-		Edges:  make([]*Edge, 1),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(gr.UniqueName); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "string",
-		Name:  "unique_name",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(gr.Name); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "string",
-		Name:  "name",
-		Value: string(buf),
-	}
-	node.Edges[0] = &Edge{
-		Type: "User",
-		Name: "users",
-	}
-	err = gr.QueryUsers().
-		Select(user.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
-	}
-	return node, nil
-}
-
-func (pe *Pet) Node(ctx context.Context) (node *Node, err error) {
-	node = &Node{
-		ID:     pe.ID,
-		Type:   "Pet",
-		Fields: make([]*Field, 3),
-		Edges:  make([]*Edge, 0),
-	}
-	var buf []byte
-	if buf, err = json.Marshal(pe.CreatedAt); err != nil {
-		return nil, err
-	}
-	node.Fields[0] = &Field{
-		Type:  "time.Time",
-		Name:  "created_at",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(pe.UpdatedAt); err != nil {
-		return nil, err
-	}
-	node.Fields[1] = &Field{
-		Type:  "time.Time",
-		Name:  "updated_at",
-		Value: string(buf),
-	}
-	if buf, err = json.Marshal(pe.Name); err != nil {
-		return nil, err
-	}
-	node.Fields[2] = &Field{
-		Type:  "string",
-		Name:  "name",
-		Value: string(buf),
-	}
-	return node, nil
-}
-
 func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
 		Fields: make([]*Field, 6),
-		Edges:  make([]*Edge, 2),
+		Edges:  make([]*Edge, 0),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(u.CreatedAt); err != nil {
@@ -151,7 +77,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[3] = &Field{
-		Type:  "string",
+		Type:  "schema.UserEmail",
 		Name:  "email",
 		Value: string(buf),
 	}
@@ -170,26 +96,6 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "int",
 		Name:  "age",
 		Value: string(buf),
-	}
-	node.Edges[0] = &Edge{
-		Type: "Pet",
-		Name: "pets",
-	}
-	err = u.QueryPets().
-		Select(pet.FieldID).
-		Scan(ctx, &node.Edges[0].IDs)
-	if err != nil {
-		return nil, err
-	}
-	node.Edges[1] = &Edge{
-		Type: "Group",
-		Name: "groups",
-	}
-	err = u.QueryGroups().
-		Select(group.FieldID).
-		Scan(ctx, &node.Edges[1].IDs)
-	if err != nil {
-		return nil, err
 	}
 	return node, nil
 }
@@ -261,24 +167,6 @@ func (c *Client) Noder(ctx context.Context, id uuid.UUID, opts ...NodeOption) (_
 
 func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, error) {
 	switch table {
-	case group.Table:
-		n, err := c.Group.Query().
-			Where(group.ID(id)).
-			CollectFields(ctx, "Group").
-			Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
-	case pet.Table:
-		n, err := c.Pet.Query().
-			Where(pet.ID(id)).
-			CollectFields(ctx, "Pet").
-			Only(ctx)
-		if err != nil {
-			return nil, err
-		}
-		return n, nil
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
@@ -361,32 +249,6 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
-	case group.Table:
-		nodes, err := c.Group.Query().
-			Where(group.IDIn(ids...)).
-			CollectFields(ctx, "Group").
-			All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
-	case pet.Table:
-		nodes, err := c.Pet.Query().
-			Where(pet.IDIn(ids...)).
-			CollectFields(ctx, "Pet").
-			All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, node := range nodes {
-			for _, noder := range idmap[node.ID] {
-				*noder = node
-			}
-		}
 	case user.Table:
 		nodes, err := c.User.Query().
 			Where(user.IDIn(ids...)).

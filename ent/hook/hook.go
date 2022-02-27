@@ -9,32 +9,6 @@ import (
 	"github.com/kichikawa/ent"
 )
 
-// The GroupFunc type is an adapter to allow the use of ordinary
-// function as Group mutator.
-type GroupFunc func(context.Context, *ent.GroupMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f GroupFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.GroupMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GroupMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The PetFunc type is an adapter to allow the use of ordinary
-// function as Pet mutator.
-type PetFunc func(context.Context, *ent.PetMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f PetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.PetMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.PetMutation", m)
-	}
-	return f(ctx, mv)
-}
-
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

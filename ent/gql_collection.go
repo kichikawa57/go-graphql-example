@@ -9,30 +9,6 @@ import (
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (gr *GroupQuery) CollectFields(ctx context.Context, satisfies ...string) *GroupQuery {
-	if fc := graphql.GetFieldContext(ctx); fc != nil {
-		gr = gr.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
-	}
-	return gr
-}
-
-func (gr *GroupQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *GroupQuery {
-	return gr
-}
-
-// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
-func (pe *PetQuery) CollectFields(ctx context.Context, satisfies ...string) *PetQuery {
-	if fc := graphql.GetFieldContext(ctx); fc != nil {
-		pe = pe.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
-	}
-	return pe
-}
-
-func (pe *PetQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *PetQuery {
-	return pe
-}
-
-// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) *UserQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		u = u.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)

@@ -7,66 +7,13 @@ import (
 	"io"
 	"strconv"
 
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/kichikawa/ent"
+	"github.com/kichikawa/ent/schema"
 )
 
-type NewTodo struct {
-	Text   string `json:"text"`
-	UserID UserId `json:"userId"`
-}
-
-type Todo struct {
-	ID        TodoId         `json:"id"`
-	Text      graphql.Upload `json:"text"`
-	Done      bool           `json:"done"`
-	Dones     bool           `json:"dones"`
-	User      *ent.User      `json:"user"`
-	Pet       *ent.Pet       `json:"pet"`
-	CreatedAt *string        `json:"createdAt"`
-}
-
-type Signal string
-
-const (
-	SignalRed    Signal = "RED"
-	SignalYellow Signal = "YELLOW"
-	SignalGreen  Signal = "GREEN"
-)
-
-var AllSignal = []Signal{
-	SignalRed,
-	SignalYellow,
-	SignalGreen,
-}
-
-func (e Signal) IsValid() bool {
-	switch e {
-	case SignalRed, SignalYellow, SignalGreen:
-		return true
-	}
-	return false
-}
-
-func (e Signal) String() string {
-	return string(e)
-}
-
-func (e *Signal) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = Signal(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid Signal", str)
-	}
-	return nil
-}
-
-func (e Signal) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
+type CreateUserInput struct {
+	Email  schema.UserEmail `json:"email"`
+	Status UserStatus       `json:"status"`
+	Age    int              `json:"age"`
 }
 
 type UserStatus string

@@ -4,7 +4,6 @@ package ent
 
 import (
 	"context"
-	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -13,8 +12,6 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/kichikawa/ent/group"
-	"github.com/kichikawa/ent/pet"
 	"github.com/kichikawa/ent/predicate"
 	"github.com/kichikawa/ent/user"
 )
@@ -28,9 +25,6 @@ type UserQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.User
-	// eager-loading edges.
-	withPets   *PetQuery
-	withGroups *GroupQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -65,50 +59,6 @@ func (uq *UserQuery) Unique(unique bool) *UserQuery {
 func (uq *UserQuery) Order(o ...OrderFunc) *UserQuery {
 	uq.order = append(uq.order, o...)
 	return uq
-}
-
-// QueryPets chains the current query on the "pets" edge.
-func (uq *UserQuery) QueryPets() *PetQuery {
-	query := &PetQuery{config: uq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(pet.Table, pet.FieldID),
-			sqlgraph.Edge(sqlgraph.O2M, false, user.PetsTable, user.PetsColumn),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
-}
-
-// QueryGroups chains the current query on the "groups" edge.
-func (uq *UserQuery) QueryGroups() *GroupQuery {
-	query := &GroupQuery{config: uq.config}
-	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
-		if err := uq.prepareQuery(ctx); err != nil {
-			return nil, err
-		}
-		selector := uq.sqlQuery(ctx)
-		if err := selector.Err(); err != nil {
-			return nil, err
-		}
-		step := sqlgraph.NewStep(
-			sqlgraph.From(user.Table, user.FieldID, selector),
-			sqlgraph.To(group.Table, group.FieldID),
-			sqlgraph.Edge(sqlgraph.M2M, false, user.GroupsTable, user.GroupsPrimaryKey...),
-		)
-		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
-		return fromU, nil
-	}
-	return query
 }
 
 // First returns the first User entity from the query.
@@ -292,34 +242,10 @@ func (uq *UserQuery) Clone() *UserQuery {
 		offset:     uq.offset,
 		order:      append([]OrderFunc{}, uq.order...),
 		predicates: append([]predicate.User{}, uq.predicates...),
-		withPets:   uq.withPets.Clone(),
-		withGroups: uq.withGroups.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
 	}
-}
-
-// WithPets tells the query-builder to eager-load the nodes that are connected to
-// the "pets" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithPets(opts ...func(*PetQuery)) *UserQuery {
-	query := &PetQuery{config: uq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withPets = query
-	return uq
-}
-
-// WithGroups tells the query-builder to eager-load the nodes that are connected to
-// the "groups" edge. The optional arguments are used to configure the query builder of the edge.
-func (uq *UserQuery) WithGroups(opts ...func(*GroupQuery)) *UserQuery {
-	query := &GroupQuery{config: uq.config}
-	for _, opt := range opts {
-		opt(query)
-	}
-	uq.withGroups = query
-	return uq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -385,12 +311,8 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 
 func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	var (
-		nodes       = []*User{}
-		_spec       = uq.querySpec()
-		loadedTypes = [2]bool{
-			uq.withPets != nil,
-			uq.withGroups != nil,
-		}
+		nodes = []*User{}
+		_spec = uq.querySpec()
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &User{config: uq.config}
@@ -402,7 +324,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
-		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, uq.driver, _spec); err != nil {
@@ -411,101 +332,6 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
-
-	if query := uq.withPets; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		nodeids := make(map[uuid.UUID]*User)
-		for i := range nodes {
-			fks = append(fks, nodes[i].ID)
-			nodeids[nodes[i].ID] = nodes[i]
-			nodes[i].Edges.Pets = []*Pet{}
-		}
-		query.withFKs = true
-		query.Where(predicate.Pet(func(s *sql.Selector) {
-			s.Where(sql.InValues(user.PetsColumn, fks...))
-		}))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			fk := n.user_id
-			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "user_id" is nil for node %v`, n.ID)
-			}
-			node, ok := nodeids[*fk]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "user_id" returned %v for node %v`, *fk, n.ID)
-			}
-			node.Edges.Pets = append(node.Edges.Pets, n)
-		}
-	}
-
-	if query := uq.withGroups; query != nil {
-		fks := make([]driver.Value, 0, len(nodes))
-		ids := make(map[uuid.UUID]*User, len(nodes))
-		for _, node := range nodes {
-			ids[node.ID] = node
-			fks = append(fks, node.ID)
-			node.Edges.Groups = []*Group{}
-		}
-		var (
-			edgeids []uuid.UUID
-			edges   = make(map[uuid.UUID][]*User)
-		)
-		_spec := &sqlgraph.EdgeQuerySpec{
-			Edge: &sqlgraph.EdgeSpec{
-				Inverse: false,
-				Table:   user.GroupsTable,
-				Columns: user.GroupsPrimaryKey,
-			},
-			Predicate: func(s *sql.Selector) {
-				s.Where(sql.InValues(user.GroupsPrimaryKey[0], fks...))
-			},
-			ScanValues: func() [2]interface{} {
-				return [2]interface{}{new(uuid.UUID), new(uuid.UUID)}
-			},
-			Assign: func(out, in interface{}) error {
-				eout, ok := out.(*uuid.UUID)
-				if !ok || eout == nil {
-					return fmt.Errorf("unexpected id value for edge-out")
-				}
-				ein, ok := in.(*uuid.UUID)
-				if !ok || ein == nil {
-					return fmt.Errorf("unexpected id value for edge-in")
-				}
-				outValue := *eout
-				inValue := *ein
-				node, ok := ids[outValue]
-				if !ok {
-					return fmt.Errorf("unexpected node id in edges: %v", outValue)
-				}
-				if _, ok := edges[inValue]; !ok {
-					edgeids = append(edgeids, inValue)
-				}
-				edges[inValue] = append(edges[inValue], node)
-				return nil
-			},
-		}
-		if err := sqlgraph.QueryEdges(ctx, uq.driver, _spec); err != nil {
-			return nil, fmt.Errorf(`query edges "groups": %w`, err)
-		}
-		query.Where(group.IDIn(edgeids...))
-		neighbors, err := query.All(ctx)
-		if err != nil {
-			return nil, err
-		}
-		for _, n := range neighbors {
-			nodes, ok := edges[n.ID]
-			if !ok {
-				return nil, fmt.Errorf(`unexpected "groups" node returned %v`, n.ID)
-			}
-			for i := range nodes {
-				nodes[i].Edges.Groups = append(nodes[i].Edges.Groups, n)
-			}
-		}
-	}
-
 	return nodes, nil
 }
 
