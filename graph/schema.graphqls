@@ -6,22 +6,19 @@ scalar UUID
 scalar Date
 
 scalar UserEmail
-
-enum UserStatus {
-  IN_PROGRESS
-  COMPLETED
-}
+scalar UserAccountName
 
 type User {
   id: UUID!
   email: UserEmail!
-  status: UserStatus!
+  accountName: UserAccountName!
+  password: String!
   age: Int!
 }
 
 input CreateUserInput {
   email: UserEmail!
-  status: UserStatus!
+  password: String!
   age: Int!
 }
 

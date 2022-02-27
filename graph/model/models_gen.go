@@ -3,56 +3,11 @@
 package model
 
 import (
-	"fmt"
-	"io"
-	"strconv"
-
-	"github.com/kichikawa/ent/schema"
+	"github.com/kichikawa/ent/schema/property"
 )
 
 type CreateUserInput struct {
-	Email  schema.UserEmail `json:"email"`
-	Status UserStatus       `json:"status"`
-	Age    int              `json:"age"`
-}
-
-type UserStatus string
-
-const (
-	UserStatusInProgress UserStatus = "IN_PROGRESS"
-	UserStatusCompleted  UserStatus = "COMPLETED"
-)
-
-var AllUserStatus = []UserStatus{
-	UserStatusInProgress,
-	UserStatusCompleted,
-}
-
-func (e UserStatus) IsValid() bool {
-	switch e {
-	case UserStatusInProgress, UserStatusCompleted:
-		return true
-	}
-	return false
-}
-
-func (e UserStatus) String() string {
-	return string(e)
-}
-
-func (e *UserStatus) UnmarshalGQL(v interface{}) error {
-	str, ok := v.(string)
-	if !ok {
-		return fmt.Errorf("enums must be strings")
-	}
-
-	*e = UserStatus(str)
-	if !e.IsValid() {
-		return fmt.Errorf("%s is not a valid UserStatus", str)
-	}
-	return nil
-}
-
-func (e UserStatus) MarshalGQL(w io.Writer) {
-	fmt.Fprint(w, strconv.Quote(e.String()))
+	Email    property.UserEmail `json:"email"`
+	Password string             `json:"password"`
+	Age      int                `json:"age"`
 }

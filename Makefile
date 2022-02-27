@@ -1,5 +1,6 @@
 
 NAME=User
+FN=user
 
 .PHONY: start
 start:

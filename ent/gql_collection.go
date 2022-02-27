@@ -9,6 +9,66 @@ import (
 )
 
 // CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (c *CommentQuery) CollectFields(ctx context.Context, satisfies ...string) *CommentQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		c = c.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return c
+}
+
+func (c *CommentQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *CommentQuery {
+	return c
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (f *FollowQuery) CollectFields(ctx context.Context, satisfies ...string) *FollowQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		f = f.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return f
+}
+
+func (f *FollowQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *FollowQuery {
+	return f
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (_go *GoodQuery) CollectFields(ctx context.Context, satisfies ...string) *GoodQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		_go = _go.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return _go
+}
+
+func (_go *GoodQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *GoodQuery {
+	return _go
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (rt *RefreshTokenQuery) CollectFields(ctx context.Context, satisfies ...string) *RefreshTokenQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		rt = rt.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return rt
+}
+
+func (rt *RefreshTokenQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *RefreshTokenQuery {
+	return rt
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
+func (t *TweetQuery) CollectFields(ctx context.Context, satisfies ...string) *TweetQuery {
+	if fc := graphql.GetFieldContext(ctx); fc != nil {
+		t = t.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)
+	}
+	return t
+}
+
+func (t *TweetQuery) collectField(ctx *graphql.OperationContext, field graphql.CollectedField, satisfies ...string) *TweetQuery {
+	return t
+}
+
+// CollectFields tells the query-builder to eagerly load connected nodes by resolver context.
 func (u *UserQuery) CollectFields(ctx context.Context, satisfies ...string) *UserQuery {
 	if fc := graphql.GetFieldContext(ctx); fc != nil {
 		u = u.collectField(graphql.GetOperationContext(ctx), fc.Field, satisfies...)

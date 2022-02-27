@@ -8,27 +8,201 @@ import (
 )
 
 var (
+	// CommentsColumns holds the columns for the "comments" table.
+	CommentsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "text", Type: field.TypeString, SchemaType: map[string]string{"postgres": "varchar(255)"}},
+		{Name: "tweet_id", Type: field.TypeUUID, Nullable: true},
+		{Name: "user_id", Type: field.TypeUUID, Nullable: true},
+	}
+	// CommentsTable holds the schema information for the "comments" table.
+	CommentsTable = &schema.Table{
+		Name:       "comments",
+		Columns:    CommentsColumns,
+		PrimaryKey: []*schema.Column{CommentsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "comments_tweets_comments",
+				Columns:    []*schema.Column{CommentsColumns[4]},
+				RefColumns: []*schema.Column{TweetsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "comments_users_comment",
+				Columns:    []*schema.Column{CommentsColumns[5]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "comment_text",
+				Unique:  false,
+				Columns: []*schema.Column{CommentsColumns[3]},
+			},
+		},
+	}
+	// FollowsColumns holds the columns for the "follows" table.
+	FollowsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "follower_id", Type: field.TypeUUID},
+		{Name: "followed_id", Type: field.TypeUUID},
+	}
+	// FollowsTable holds the schema information for the "follows" table.
+	FollowsTable = &schema.Table{
+		Name:       "follows",
+		Columns:    FollowsColumns,
+		PrimaryKey: []*schema.Column{FollowsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "follows_users_follower",
+				Columns:    []*schema.Column{FollowsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "follows_users_followed",
+				Columns:    []*schema.Column{FollowsColumns[4]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "follow_follower_id_followed_id",
+				Unique:  true,
+				Columns: []*schema.Column{FollowsColumns[3], FollowsColumns[4]},
+			},
+		},
+	}
+	// GoodsColumns holds the columns for the "goods" table.
+	GoodsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "tweet_id", Type: field.TypeUUID},
+	}
+	// GoodsTable holds the schema information for the "goods" table.
+	GoodsTable = &schema.Table{
+		Name:       "goods",
+		Columns:    GoodsColumns,
+		PrimaryKey: []*schema.Column{GoodsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "goods_tweets_goods",
+				Columns:    []*schema.Column{GoodsColumns[4]},
+				RefColumns: []*schema.Column{TweetsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+			{
+				Symbol:     "goods_users_good",
+				Columns:    []*schema.Column{GoodsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "good_user_id_tweet_id",
+				Unique:  true,
+				Columns: []*schema.Column{GoodsColumns[3], GoodsColumns[4]},
+			},
+		},
+	}
+	// RefreshTokensColumns holds the columns for the "refresh_tokens" table.
+	RefreshTokensColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "token", Type: field.TypeString, SchemaType: map[string]string{"postgres": "varchar(255)"}},
+		{Name: "expires_at", Type: field.TypeTime},
+	}
+	// RefreshTokensTable holds the schema information for the "refresh_tokens" table.
+	RefreshTokensTable = &schema.Table{
+		Name:       "refresh_tokens",
+		Columns:    RefreshTokensColumns,
+		PrimaryKey: []*schema.Column{RefreshTokensColumns[0]},
+	}
+	// TweetsColumns holds the columns for the "tweets" table.
+	TweetsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeUUID},
+		{Name: "created_at", Type: field.TypeTime},
+		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "text", Type: field.TypeString, SchemaType: map[string]string{"postgres": "text"}},
+		{Name: "type", Type: field.TypeEnum, Enums: []string{"unpublic", "public"}},
+	}
+	// TweetsTable holds the schema information for the "tweets" table.
+	TweetsTable = &schema.Table{
+		Name:       "tweets",
+		Columns:    TweetsColumns,
+		PrimaryKey: []*schema.Column{TweetsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "tweets_users_tweet",
+				Columns:    []*schema.Column{TweetsColumns[3]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "tweet_text_type",
+				Unique:  false,
+				Columns: []*schema.Column{TweetsColumns[4], TweetsColumns[5]},
+			},
+			{
+				Name:    "tweet_user_id",
+				Unique:  false,
+				Columns: []*schema.Column{TweetsColumns[3]},
+			},
+		},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
-		{Name: "account_name", Type: field.TypeString, Unique: true},
+		{Name: "account_name", Type: field.TypeString, Unique: true, SchemaType: map[string]string{"postgres": "varchar(15)"}},
 		{Name: "email", Type: field.TypeString, Unique: true, SchemaType: map[string]string{"postgres": "varchar(30)"}},
-		{Name: "status", Type: field.TypeEnum, Enums: []string{"IN_PROGRESS", "COMPLETED"}},
-		{Name: "age", Type: field.TypeInt, Nullable: true, SchemaType: map[string]string{"postgres": "int"}},
+		{Name: "password", Type: field.TypeString, SchemaType: map[string]string{"postgres": "varchar(255)"}},
+		{Name: "age", Type: field.TypeInt, SchemaType: map[string]string{"postgres": "int"}},
 	}
 	// UsersTable holds the schema information for the "users" table.
 	UsersTable = &schema.Table{
 		Name:       "users",
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
+		Indexes: []*schema.Index{
+			{
+				Name:    "user_email_account_name",
+				Unique:  false,
+				Columns: []*schema.Column{UsersColumns[4], UsersColumns[3]},
+			},
+		},
 	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
+		CommentsTable,
+		FollowsTable,
+		GoodsTable,
+		RefreshTokensTable,
+		TweetsTable,
 		UsersTable,
 	}
 )
 
 func init() {
+	CommentsTable.ForeignKeys[0].RefTable = TweetsTable
+	CommentsTable.ForeignKeys[1].RefTable = UsersTable
+	FollowsTable.ForeignKeys[0].RefTable = UsersTable
+	FollowsTable.ForeignKeys[1].RefTable = UsersTable
+	GoodsTable.ForeignKeys[0].RefTable = TweetsTable
+	GoodsTable.ForeignKeys[1].RefTable = UsersTable
+	TweetsTable.ForeignKeys[0].RefTable = UsersTable
 }

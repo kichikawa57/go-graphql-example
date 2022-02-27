@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/google/uuid"
-	"github.com/kichikawa/ent/schema"
+	"github.com/kichikawa/ent/schema/property"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -23,13 +23,78 @@ type User struct {
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
 	// AccountName holds the value of the "account_name" field.
-	AccountName string `json:"account_name,omitempty"`
+	AccountName property.UserAccountName `json:"account_name,omitempty"`
 	// Email holds the value of the "email" field.
-	Email schema.UserEmail `json:"email,omitempty"`
-	// Status holds the value of the "status" field.
-	Status user.Status `json:"status,omitempty"`
+	Email property.UserEmail `json:"email,omitempty"`
+	// Password holds the value of the "password" field.
+	Password string `json:"password,omitempty"`
 	// Age holds the value of the "age" field.
 	Age int `json:"age,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Tweet holds the value of the tweet edge.
+	Tweet []*Tweet `json:"tweet,omitempty"`
+	// Good holds the value of the good edge.
+	Good []*Good `json:"good,omitempty"`
+	// Comment holds the value of the comment edge.
+	Comment []*Comment `json:"comment,omitempty"`
+	// Follower holds the value of the follower edge.
+	Follower []*Follow `json:"follower,omitempty"`
+	// Followed holds the value of the followed edge.
+	Followed []*Follow `json:"followed,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [5]bool
+}
+
+// TweetOrErr returns the Tweet value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) TweetOrErr() ([]*Tweet, error) {
+	if e.loadedTypes[0] {
+		return e.Tweet, nil
+	}
+	return nil, &NotLoadedError{edge: "tweet"}
+}
+
+// GoodOrErr returns the Good value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) GoodOrErr() ([]*Good, error) {
+	if e.loadedTypes[1] {
+		return e.Good, nil
+	}
+	return nil, &NotLoadedError{edge: "good"}
+}
+
+// CommentOrErr returns the Comment value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) CommentOrErr() ([]*Comment, error) {
+	if e.loadedTypes[2] {
+		return e.Comment, nil
+	}
+	return nil, &NotLoadedError{edge: "comment"}
+}
+
+// FollowerOrErr returns the Follower value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) FollowerOrErr() ([]*Follow, error) {
+	if e.loadedTypes[3] {
+		return e.Follower, nil
+	}
+	return nil, &NotLoadedError{edge: "follower"}
+}
+
+// FollowedOrErr returns the Followed value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) FollowedOrErr() ([]*Follow, error) {
+	if e.loadedTypes[4] {
+		return e.Followed, nil
+	}
+	return nil, &NotLoadedError{edge: "followed"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -39,7 +104,7 @@ func (*User) scanValues(columns []string) ([]interface{}, error) {
 		switch columns[i] {
 		case user.FieldAge:
 			values[i] = new(sql.NullInt64)
-		case user.FieldAccountName, user.FieldEmail, user.FieldStatus:
+		case user.FieldAccountName, user.FieldEmail, user.FieldPassword:
 			values[i] = new(sql.NullString)
 		case user.FieldCreatedAt, user.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
@@ -82,19 +147,19 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field account_name", values[i])
 			} else if value.Valid {
-				u.AccountName = value.String
+				u.AccountName = property.UserAccountName(value.String)
 			}
 		case user.FieldEmail:
 			if value, ok := values[i].(*sql.NullString); !ok {
 				return fmt.Errorf("unexpected type %T for field email", values[i])
 			} else if value.Valid {
-				u.Email = schema.UserEmail(value.String)
+				u.Email = property.UserEmail(value.String)
 			}
-		case user.FieldStatus:
+		case user.FieldPassword:
 			if value, ok := values[i].(*sql.NullString); !ok {
-				return fmt.Errorf("unexpected type %T for field status", values[i])
+				return fmt.Errorf("unexpected type %T for field password", values[i])
 			} else if value.Valid {
-				u.Status = user.Status(value.String)
+				u.Password = value.String
 			}
 		case user.FieldAge:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -105,6 +170,31 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryTweet queries the "tweet" edge of the User entity.
+func (u *User) QueryTweet() *TweetQuery {
+	return (&UserClient{config: u.config}).QueryTweet(u)
+}
+
+// QueryGood queries the "good" edge of the User entity.
+func (u *User) QueryGood() *GoodQuery {
+	return (&UserClient{config: u.config}).QueryGood(u)
+}
+
+// QueryComment queries the "comment" edge of the User entity.
+func (u *User) QueryComment() *CommentQuery {
+	return (&UserClient{config: u.config}).QueryComment(u)
+}
+
+// QueryFollower queries the "follower" edge of the User entity.
+func (u *User) QueryFollower() *FollowQuery {
+	return (&UserClient{config: u.config}).QueryFollower(u)
+}
+
+// QueryFollowed queries the "followed" edge of the User entity.
+func (u *User) QueryFollowed() *FollowQuery {
+	return (&UserClient{config: u.config}).QueryFollowed(u)
 }
 
 // Update returns a builder for updating this User.
@@ -135,11 +225,11 @@ func (u *User) String() string {
 	builder.WriteString(", updated_at=")
 	builder.WriteString(u.UpdatedAt.Format(time.ANSIC))
 	builder.WriteString(", account_name=")
-	builder.WriteString(u.AccountName)
+	builder.WriteString(fmt.Sprintf("%v", u.AccountName))
 	builder.WriteString(", email=")
 	builder.WriteString(fmt.Sprintf("%v", u.Email))
-	builder.WriteString(", status=")
-	builder.WriteString(fmt.Sprintf("%v", u.Status))
+	builder.WriteString(", password=")
+	builder.WriteString(u.Password)
 	builder.WriteString(", age=")
 	builder.WriteString(fmt.Sprintf("%v", u.Age))
 	builder.WriteByte(')')

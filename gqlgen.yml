@@ -37,7 +37,7 @@ resolver:
 # if they match it will use them, otherwise it will generate them.
 autobind:
   - github.com/kichikawa/ent
-  - github.com/kichikawa/ent/schema
+  - github.com/kichikawa/ent/schema/property
 
 # This section declares type mapping between the GraphQL and go type systems
 #

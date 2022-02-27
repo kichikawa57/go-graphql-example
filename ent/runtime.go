@@ -6,7 +6,12 @@ import (
 	"time"
 
 	"github.com/google/uuid"
+	"github.com/kichikawa/ent/comment"
+	"github.com/kichikawa/ent/follow"
+	"github.com/kichikawa/ent/good"
+	"github.com/kichikawa/ent/refreshtoken"
 	"github.com/kichikawa/ent/schema"
+	"github.com/kichikawa/ent/tweet"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -14,6 +19,101 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	commentMixin := schema.Comment{}.Mixin()
+	commentMixinFields0 := commentMixin[0].Fields()
+	_ = commentMixinFields0
+	commentFields := schema.Comment{}.Fields()
+	_ = commentFields
+	// commentDescCreatedAt is the schema descriptor for created_at field.
+	commentDescCreatedAt := commentMixinFields0[0].Descriptor()
+	// comment.DefaultCreatedAt holds the default value on creation for the created_at field.
+	comment.DefaultCreatedAt = commentDescCreatedAt.Default.(func() time.Time)
+	// commentDescUpdatedAt is the schema descriptor for updated_at field.
+	commentDescUpdatedAt := commentMixinFields0[1].Descriptor()
+	// comment.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	comment.DefaultUpdatedAt = commentDescUpdatedAt.Default.(func() time.Time)
+	// comment.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	comment.UpdateDefaultUpdatedAt = commentDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// commentDescID is the schema descriptor for id field.
+	commentDescID := commentFields[0].Descriptor()
+	// comment.DefaultID holds the default value on creation for the id field.
+	comment.DefaultID = commentDescID.Default.(func() uuid.UUID)
+	followMixin := schema.Follow{}.Mixin()
+	followMixinFields0 := followMixin[0].Fields()
+	_ = followMixinFields0
+	followFields := schema.Follow{}.Fields()
+	_ = followFields
+	// followDescCreatedAt is the schema descriptor for created_at field.
+	followDescCreatedAt := followMixinFields0[0].Descriptor()
+	// follow.DefaultCreatedAt holds the default value on creation for the created_at field.
+	follow.DefaultCreatedAt = followDescCreatedAt.Default.(func() time.Time)
+	// followDescUpdatedAt is the schema descriptor for updated_at field.
+	followDescUpdatedAt := followMixinFields0[1].Descriptor()
+	// follow.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	follow.DefaultUpdatedAt = followDescUpdatedAt.Default.(func() time.Time)
+	// follow.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	follow.UpdateDefaultUpdatedAt = followDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// followDescID is the schema descriptor for id field.
+	followDescID := followFields[0].Descriptor()
+	// follow.DefaultID holds the default value on creation for the id field.
+	follow.DefaultID = followDescID.Default.(func() uuid.UUID)
+	goodMixin := schema.Good{}.Mixin()
+	goodMixinFields0 := goodMixin[0].Fields()
+	_ = goodMixinFields0
+	goodFields := schema.Good{}.Fields()
+	_ = goodFields
+	// goodDescCreatedAt is the schema descriptor for created_at field.
+	goodDescCreatedAt := goodMixinFields0[0].Descriptor()
+	// good.DefaultCreatedAt holds the default value on creation for the created_at field.
+	good.DefaultCreatedAt = goodDescCreatedAt.Default.(func() time.Time)
+	// goodDescUpdatedAt is the schema descriptor for updated_at field.
+	goodDescUpdatedAt := goodMixinFields0[1].Descriptor()
+	// good.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	good.DefaultUpdatedAt = goodDescUpdatedAt.Default.(func() time.Time)
+	// good.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	good.UpdateDefaultUpdatedAt = goodDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// goodDescID is the schema descriptor for id field.
+	goodDescID := goodFields[0].Descriptor()
+	// good.DefaultID holds the default value on creation for the id field.
+	good.DefaultID = goodDescID.Default.(func() uuid.UUID)
+	refreshtokenMixin := schema.RefreshToken{}.Mixin()
+	refreshtokenMixinFields0 := refreshtokenMixin[0].Fields()
+	_ = refreshtokenMixinFields0
+	refreshtokenFields := schema.RefreshToken{}.Fields()
+	_ = refreshtokenFields
+	// refreshtokenDescCreatedAt is the schema descriptor for created_at field.
+	refreshtokenDescCreatedAt := refreshtokenMixinFields0[0].Descriptor()
+	// refreshtoken.DefaultCreatedAt holds the default value on creation for the created_at field.
+	refreshtoken.DefaultCreatedAt = refreshtokenDescCreatedAt.Default.(func() time.Time)
+	// refreshtokenDescUpdatedAt is the schema descriptor for updated_at field.
+	refreshtokenDescUpdatedAt := refreshtokenMixinFields0[1].Descriptor()
+	// refreshtoken.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	refreshtoken.DefaultUpdatedAt = refreshtokenDescUpdatedAt.Default.(func() time.Time)
+	// refreshtoken.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	refreshtoken.UpdateDefaultUpdatedAt = refreshtokenDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// refreshtokenDescID is the schema descriptor for id field.
+	refreshtokenDescID := refreshtokenFields[0].Descriptor()
+	// refreshtoken.DefaultID holds the default value on creation for the id field.
+	refreshtoken.DefaultID = refreshtokenDescID.Default.(func() uuid.UUID)
+	tweetMixin := schema.Tweet{}.Mixin()
+	tweetMixinFields0 := tweetMixin[0].Fields()
+	_ = tweetMixinFields0
+	tweetFields := schema.Tweet{}.Fields()
+	_ = tweetFields
+	// tweetDescCreatedAt is the schema descriptor for created_at field.
+	tweetDescCreatedAt := tweetMixinFields0[0].Descriptor()
+	// tweet.DefaultCreatedAt holds the default value on creation for the created_at field.
+	tweet.DefaultCreatedAt = tweetDescCreatedAt.Default.(func() time.Time)
+	// tweetDescUpdatedAt is the schema descriptor for updated_at field.
+	tweetDescUpdatedAt := tweetMixinFields0[1].Descriptor()
+	// tweet.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	tweet.DefaultUpdatedAt = tweetDescUpdatedAt.Default.(func() time.Time)
+	// tweet.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	tweet.UpdateDefaultUpdatedAt = tweetDescUpdatedAt.UpdateDefault.(func() time.Time)
+	// tweetDescID is the schema descriptor for id field.
+	tweetDescID := tweetFields[0].Descriptor()
+	// tweet.DefaultID holds the default value on creation for the id field.
+	tweet.DefaultID = tweetDescID.Default.(func() uuid.UUID)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0

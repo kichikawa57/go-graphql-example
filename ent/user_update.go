@@ -11,8 +11,13 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
+	"github.com/kichikawa/ent/comment"
+	"github.com/kichikawa/ent/follow"
+	"github.com/kichikawa/ent/good"
 	"github.com/kichikawa/ent/predicate"
-	"github.com/kichikawa/ent/schema"
+	"github.com/kichikawa/ent/schema/property"
+	"github.com/kichikawa/ent/tweet"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -36,20 +41,20 @@ func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
 }
 
 // SetAccountName sets the "account_name" field.
-func (uu *UserUpdate) SetAccountName(s string) *UserUpdate {
-	uu.mutation.SetAccountName(s)
+func (uu *UserUpdate) SetAccountName(pan property.UserAccountName) *UserUpdate {
+	uu.mutation.SetAccountName(pan)
 	return uu
 }
 
 // SetEmail sets the "email" field.
-func (uu *UserUpdate) SetEmail(se schema.UserEmail) *UserUpdate {
-	uu.mutation.SetEmail(se)
+func (uu *UserUpdate) SetEmail(pe property.UserEmail) *UserUpdate {
+	uu.mutation.SetEmail(pe)
 	return uu
 }
 
-// SetStatus sets the "status" field.
-func (uu *UserUpdate) SetStatus(u user.Status) *UserUpdate {
-	uu.mutation.SetStatus(u)
+// SetPassword sets the "password" field.
+func (uu *UserUpdate) SetPassword(s string) *UserUpdate {
+	uu.mutation.SetPassword(s)
 	return uu
 }
 
@@ -60,29 +65,195 @@ func (uu *UserUpdate) SetAge(i int) *UserUpdate {
 	return uu
 }
 
-// SetNillableAge sets the "age" field if the given value is not nil.
-func (uu *UserUpdate) SetNillableAge(i *int) *UserUpdate {
-	if i != nil {
-		uu.SetAge(*i)
-	}
-	return uu
-}
-
 // AddAge adds i to the "age" field.
 func (uu *UserUpdate) AddAge(i int) *UserUpdate {
 	uu.mutation.AddAge(i)
 	return uu
 }
 
-// ClearAge clears the value of the "age" field.
-func (uu *UserUpdate) ClearAge() *UserUpdate {
-	uu.mutation.ClearAge()
+// AddTweetIDs adds the "tweet" edge to the Tweet entity by IDs.
+func (uu *UserUpdate) AddTweetIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddTweetIDs(ids...)
 	return uu
+}
+
+// AddTweet adds the "tweet" edges to the Tweet entity.
+func (uu *UserUpdate) AddTweet(t ...*Tweet) *UserUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.AddTweetIDs(ids...)
+}
+
+// AddGoodIDs adds the "good" edge to the Good entity by IDs.
+func (uu *UserUpdate) AddGoodIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddGoodIDs(ids...)
+	return uu
+}
+
+// AddGood adds the "good" edges to the Good entity.
+func (uu *UserUpdate) AddGood(g ...*Good) *UserUpdate {
+	ids := make([]uuid.UUID, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uu.AddGoodIDs(ids...)
+}
+
+// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
+func (uu *UserUpdate) AddCommentIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddCommentIDs(ids...)
+	return uu
+}
+
+// AddComment adds the "comment" edges to the Comment entity.
+func (uu *UserUpdate) AddComment(c ...*Comment) *UserUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.AddCommentIDs(ids...)
+}
+
+// AddFollowerIDs adds the "follower" edge to the Follow entity by IDs.
+func (uu *UserUpdate) AddFollowerIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddFollowerIDs(ids...)
+	return uu
+}
+
+// AddFollower adds the "follower" edges to the Follow entity.
+func (uu *UserUpdate) AddFollower(f ...*Follow) *UserUpdate {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.AddFollowerIDs(ids...)
+}
+
+// AddFollowedIDs adds the "followed" edge to the Follow entity by IDs.
+func (uu *UserUpdate) AddFollowedIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.AddFollowedIDs(ids...)
+	return uu
+}
+
+// AddFollowed adds the "followed" edges to the Follow entity.
+func (uu *UserUpdate) AddFollowed(f ...*Follow) *UserUpdate {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.AddFollowedIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearTweet clears all "tweet" edges to the Tweet entity.
+func (uu *UserUpdate) ClearTweet() *UserUpdate {
+	uu.mutation.ClearTweet()
+	return uu
+}
+
+// RemoveTweetIDs removes the "tweet" edge to Tweet entities by IDs.
+func (uu *UserUpdate) RemoveTweetIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveTweetIDs(ids...)
+	return uu
+}
+
+// RemoveTweet removes "tweet" edges to Tweet entities.
+func (uu *UserUpdate) RemoveTweet(t ...*Tweet) *UserUpdate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uu.RemoveTweetIDs(ids...)
+}
+
+// ClearGood clears all "good" edges to the Good entity.
+func (uu *UserUpdate) ClearGood() *UserUpdate {
+	uu.mutation.ClearGood()
+	return uu
+}
+
+// RemoveGoodIDs removes the "good" edge to Good entities by IDs.
+func (uu *UserUpdate) RemoveGoodIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveGoodIDs(ids...)
+	return uu
+}
+
+// RemoveGood removes "good" edges to Good entities.
+func (uu *UserUpdate) RemoveGood(g ...*Good) *UserUpdate {
+	ids := make([]uuid.UUID, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uu.RemoveGoodIDs(ids...)
+}
+
+// ClearComment clears all "comment" edges to the Comment entity.
+func (uu *UserUpdate) ClearComment() *UserUpdate {
+	uu.mutation.ClearComment()
+	return uu
+}
+
+// RemoveCommentIDs removes the "comment" edge to Comment entities by IDs.
+func (uu *UserUpdate) RemoveCommentIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveCommentIDs(ids...)
+	return uu
+}
+
+// RemoveComment removes "comment" edges to Comment entities.
+func (uu *UserUpdate) RemoveComment(c ...*Comment) *UserUpdate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uu.RemoveCommentIDs(ids...)
+}
+
+// ClearFollower clears all "follower" edges to the Follow entity.
+func (uu *UserUpdate) ClearFollower() *UserUpdate {
+	uu.mutation.ClearFollower()
+	return uu
+}
+
+// RemoveFollowerIDs removes the "follower" edge to Follow entities by IDs.
+func (uu *UserUpdate) RemoveFollowerIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveFollowerIDs(ids...)
+	return uu
+}
+
+// RemoveFollower removes "follower" edges to Follow entities.
+func (uu *UserUpdate) RemoveFollower(f ...*Follow) *UserUpdate {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.RemoveFollowerIDs(ids...)
+}
+
+// ClearFollowed clears all "followed" edges to the Follow entity.
+func (uu *UserUpdate) ClearFollowed() *UserUpdate {
+	uu.mutation.ClearFollowed()
+	return uu
+}
+
+// RemoveFollowedIDs removes the "followed" edge to Follow entities by IDs.
+func (uu *UserUpdate) RemoveFollowedIDs(ids ...uuid.UUID) *UserUpdate {
+	uu.mutation.RemoveFollowedIDs(ids...)
+	return uu
+}
+
+// RemoveFollowed removes "followed" edges to Follow entities.
+func (uu *UserUpdate) RemoveFollowed(f ...*Follow) *UserUpdate {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uu.RemoveFollowedIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -93,18 +264,12 @@ func (uu *UserUpdate) Save(ctx context.Context) (int, error) {
 	)
 	uu.defaults()
 	if len(uu.hooks) == 0 {
-		if err = uu.check(); err != nil {
-			return 0, err
-		}
 		affected, err = uu.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*UserMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = uu.check(); err != nil {
-				return 0, err
 			}
 			uu.mutation = mutation
 			affected, err = uu.sqlSave(ctx)
@@ -154,16 +319,6 @@ func (uu *UserUpdate) defaults() {
 	}
 }
 
-// check runs all checks and user-defined validators on the builder.
-func (uu *UserUpdate) check() error {
-	if v, ok := uu.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
-		}
-	}
-	return nil
-}
-
 func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	_spec := &sqlgraph.UpdateSpec{
 		Node: &sqlgraph.NodeSpec{
@@ -203,11 +358,11 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldEmail,
 		})
 	}
-	if value, ok := uu.mutation.Status(); ok {
+	if value, ok := uu.mutation.Password(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: user.FieldStatus,
+			Column: user.FieldPassword,
 		})
 	}
 	if value, ok := uu.mutation.Age(); ok {
@@ -224,11 +379,275 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldAge,
 		})
 	}
-	if uu.mutation.AgeCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Column: user.FieldAge,
-		})
+	if uu.mutation.TweetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TweetTable,
+			Columns: []string{user.TweetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tweet.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedTweetIDs(); len(nodes) > 0 && !uu.mutation.TweetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TweetTable,
+			Columns: []string{user.TweetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tweet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.TweetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TweetTable,
+			Columns: []string{user.TweetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tweet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.GoodCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.GoodTable,
+			Columns: []string{user.GoodColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: good.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedGoodIDs(); len(nodes) > 0 && !uu.mutation.GoodCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.GoodTable,
+			Columns: []string{user.GoodColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: good.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.GoodIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.GoodTable,
+			Columns: []string{user.GoodColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: good.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.CommentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentTable,
+			Columns: []string{user.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: comment.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedCommentIDs(); len(nodes) > 0 && !uu.mutation.CommentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentTable,
+			Columns: []string{user.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: comment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.CommentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentTable,
+			Columns: []string{user.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: comment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.FollowerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowerTable,
+			Columns: []string{user.FollowerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedFollowerIDs(); len(nodes) > 0 && !uu.mutation.FollowerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowerTable,
+			Columns: []string{user.FollowerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.FollowerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowerTable,
+			Columns: []string{user.FollowerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.FollowedCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowedTable,
+			Columns: []string{user.FollowedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedFollowedIDs(); len(nodes) > 0 && !uu.mutation.FollowedCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowedTable,
+			Columns: []string{user.FollowedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.FollowedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowedTable,
+			Columns: []string{user.FollowedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -256,20 +675,20 @@ func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
 }
 
 // SetAccountName sets the "account_name" field.
-func (uuo *UserUpdateOne) SetAccountName(s string) *UserUpdateOne {
-	uuo.mutation.SetAccountName(s)
+func (uuo *UserUpdateOne) SetAccountName(pan property.UserAccountName) *UserUpdateOne {
+	uuo.mutation.SetAccountName(pan)
 	return uuo
 }
 
 // SetEmail sets the "email" field.
-func (uuo *UserUpdateOne) SetEmail(se schema.UserEmail) *UserUpdateOne {
-	uuo.mutation.SetEmail(se)
+func (uuo *UserUpdateOne) SetEmail(pe property.UserEmail) *UserUpdateOne {
+	uuo.mutation.SetEmail(pe)
 	return uuo
 }
 
-// SetStatus sets the "status" field.
-func (uuo *UserUpdateOne) SetStatus(u user.Status) *UserUpdateOne {
-	uuo.mutation.SetStatus(u)
+// SetPassword sets the "password" field.
+func (uuo *UserUpdateOne) SetPassword(s string) *UserUpdateOne {
+	uuo.mutation.SetPassword(s)
 	return uuo
 }
 
@@ -280,29 +699,195 @@ func (uuo *UserUpdateOne) SetAge(i int) *UserUpdateOne {
 	return uuo
 }
 
-// SetNillableAge sets the "age" field if the given value is not nil.
-func (uuo *UserUpdateOne) SetNillableAge(i *int) *UserUpdateOne {
-	if i != nil {
-		uuo.SetAge(*i)
-	}
-	return uuo
-}
-
 // AddAge adds i to the "age" field.
 func (uuo *UserUpdateOne) AddAge(i int) *UserUpdateOne {
 	uuo.mutation.AddAge(i)
 	return uuo
 }
 
-// ClearAge clears the value of the "age" field.
-func (uuo *UserUpdateOne) ClearAge() *UserUpdateOne {
-	uuo.mutation.ClearAge()
+// AddTweetIDs adds the "tweet" edge to the Tweet entity by IDs.
+func (uuo *UserUpdateOne) AddTweetIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddTweetIDs(ids...)
 	return uuo
+}
+
+// AddTweet adds the "tweet" edges to the Tweet entity.
+func (uuo *UserUpdateOne) AddTweet(t ...*Tweet) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.AddTweetIDs(ids...)
+}
+
+// AddGoodIDs adds the "good" edge to the Good entity by IDs.
+func (uuo *UserUpdateOne) AddGoodIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddGoodIDs(ids...)
+	return uuo
+}
+
+// AddGood adds the "good" edges to the Good entity.
+func (uuo *UserUpdateOne) AddGood(g ...*Good) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uuo.AddGoodIDs(ids...)
+}
+
+// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
+func (uuo *UserUpdateOne) AddCommentIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddCommentIDs(ids...)
+	return uuo
+}
+
+// AddComment adds the "comment" edges to the Comment entity.
+func (uuo *UserUpdateOne) AddComment(c ...*Comment) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.AddCommentIDs(ids...)
+}
+
+// AddFollowerIDs adds the "follower" edge to the Follow entity by IDs.
+func (uuo *UserUpdateOne) AddFollowerIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddFollowerIDs(ids...)
+	return uuo
+}
+
+// AddFollower adds the "follower" edges to the Follow entity.
+func (uuo *UserUpdateOne) AddFollower(f ...*Follow) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.AddFollowerIDs(ids...)
+}
+
+// AddFollowedIDs adds the "followed" edge to the Follow entity by IDs.
+func (uuo *UserUpdateOne) AddFollowedIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.AddFollowedIDs(ids...)
+	return uuo
+}
+
+// AddFollowed adds the "followed" edges to the Follow entity.
+func (uuo *UserUpdateOne) AddFollowed(f ...*Follow) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.AddFollowedIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearTweet clears all "tweet" edges to the Tweet entity.
+func (uuo *UserUpdateOne) ClearTweet() *UserUpdateOne {
+	uuo.mutation.ClearTweet()
+	return uuo
+}
+
+// RemoveTweetIDs removes the "tweet" edge to Tweet entities by IDs.
+func (uuo *UserUpdateOne) RemoveTweetIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveTweetIDs(ids...)
+	return uuo
+}
+
+// RemoveTweet removes "tweet" edges to Tweet entities.
+func (uuo *UserUpdateOne) RemoveTweet(t ...*Tweet) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uuo.RemoveTweetIDs(ids...)
+}
+
+// ClearGood clears all "good" edges to the Good entity.
+func (uuo *UserUpdateOne) ClearGood() *UserUpdateOne {
+	uuo.mutation.ClearGood()
+	return uuo
+}
+
+// RemoveGoodIDs removes the "good" edge to Good entities by IDs.
+func (uuo *UserUpdateOne) RemoveGoodIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveGoodIDs(ids...)
+	return uuo
+}
+
+// RemoveGood removes "good" edges to Good entities.
+func (uuo *UserUpdateOne) RemoveGood(g ...*Good) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uuo.RemoveGoodIDs(ids...)
+}
+
+// ClearComment clears all "comment" edges to the Comment entity.
+func (uuo *UserUpdateOne) ClearComment() *UserUpdateOne {
+	uuo.mutation.ClearComment()
+	return uuo
+}
+
+// RemoveCommentIDs removes the "comment" edge to Comment entities by IDs.
+func (uuo *UserUpdateOne) RemoveCommentIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveCommentIDs(ids...)
+	return uuo
+}
+
+// RemoveComment removes "comment" edges to Comment entities.
+func (uuo *UserUpdateOne) RemoveComment(c ...*Comment) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uuo.RemoveCommentIDs(ids...)
+}
+
+// ClearFollower clears all "follower" edges to the Follow entity.
+func (uuo *UserUpdateOne) ClearFollower() *UserUpdateOne {
+	uuo.mutation.ClearFollower()
+	return uuo
+}
+
+// RemoveFollowerIDs removes the "follower" edge to Follow entities by IDs.
+func (uuo *UserUpdateOne) RemoveFollowerIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveFollowerIDs(ids...)
+	return uuo
+}
+
+// RemoveFollower removes "follower" edges to Follow entities.
+func (uuo *UserUpdateOne) RemoveFollower(f ...*Follow) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.RemoveFollowerIDs(ids...)
+}
+
+// ClearFollowed clears all "followed" edges to the Follow entity.
+func (uuo *UserUpdateOne) ClearFollowed() *UserUpdateOne {
+	uuo.mutation.ClearFollowed()
+	return uuo
+}
+
+// RemoveFollowedIDs removes the "followed" edge to Follow entities by IDs.
+func (uuo *UserUpdateOne) RemoveFollowedIDs(ids ...uuid.UUID) *UserUpdateOne {
+	uuo.mutation.RemoveFollowedIDs(ids...)
+	return uuo
+}
+
+// RemoveFollowed removes "followed" edges to Follow entities.
+func (uuo *UserUpdateOne) RemoveFollowed(f ...*Follow) *UserUpdateOne {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uuo.RemoveFollowedIDs(ids...)
 }
 
 // Select allows selecting one or more fields (columns) of the returned entity.
@@ -320,18 +905,12 @@ func (uuo *UserUpdateOne) Save(ctx context.Context) (*User, error) {
 	)
 	uuo.defaults()
 	if len(uuo.hooks) == 0 {
-		if err = uuo.check(); err != nil {
-			return nil, err
-		}
 		node, err = uuo.sqlSave(ctx)
 	} else {
 		var mut Mutator = MutateFunc(func(ctx context.Context, m Mutation) (Value, error) {
 			mutation, ok := m.(*UserMutation)
 			if !ok {
 				return nil, fmt.Errorf("unexpected mutation type %T", m)
-			}
-			if err = uuo.check(); err != nil {
-				return nil, err
 			}
 			uuo.mutation = mutation
 			node, err = uuo.sqlSave(ctx)
@@ -379,16 +958,6 @@ func (uuo *UserUpdateOne) defaults() {
 		v := user.UpdateDefaultUpdatedAt()
 		uuo.mutation.SetUpdatedAt(v)
 	}
-}
-
-// check runs all checks and user-defined validators on the builder.
-func (uuo *UserUpdateOne) check() error {
-	if v, ok := uuo.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
-		}
-	}
-	return nil
 }
 
 func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) {
@@ -447,11 +1016,11 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Column: user.FieldEmail,
 		})
 	}
-	if value, ok := uuo.mutation.Status(); ok {
+	if value, ok := uuo.mutation.Password(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: user.FieldStatus,
+			Column: user.FieldPassword,
 		})
 	}
 	if value, ok := uuo.mutation.Age(); ok {
@@ -468,11 +1037,275 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Column: user.FieldAge,
 		})
 	}
-	if uuo.mutation.AgeCleared() {
-		_spec.Fields.Clear = append(_spec.Fields.Clear, &sqlgraph.FieldSpec{
-			Type:   field.TypeInt,
-			Column: user.FieldAge,
-		})
+	if uuo.mutation.TweetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TweetTable,
+			Columns: []string{user.TweetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tweet.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedTweetIDs(); len(nodes) > 0 && !uuo.mutation.TweetCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TweetTable,
+			Columns: []string{user.TweetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tweet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.TweetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TweetTable,
+			Columns: []string{user.TweetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tweet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.GoodCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.GoodTable,
+			Columns: []string{user.GoodColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: good.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedGoodIDs(); len(nodes) > 0 && !uuo.mutation.GoodCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.GoodTable,
+			Columns: []string{user.GoodColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: good.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.GoodIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.GoodTable,
+			Columns: []string{user.GoodColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: good.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.CommentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentTable,
+			Columns: []string{user.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: comment.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedCommentIDs(); len(nodes) > 0 && !uuo.mutation.CommentCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentTable,
+			Columns: []string{user.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: comment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.CommentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentTable,
+			Columns: []string{user.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: comment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.FollowerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowerTable,
+			Columns: []string{user.FollowerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedFollowerIDs(); len(nodes) > 0 && !uuo.mutation.FollowerCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowerTable,
+			Columns: []string{user.FollowerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.FollowerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowerTable,
+			Columns: []string{user.FollowerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.FollowedCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowedTable,
+			Columns: []string{user.FollowedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedFollowedIDs(); len(nodes) > 0 && !uuo.mutation.FollowedCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowedTable,
+			Columns: []string{user.FollowedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.FollowedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowedTable,
+			Columns: []string{user.FollowedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

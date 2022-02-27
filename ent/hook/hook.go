@@ -9,6 +9,71 @@ import (
 	"github.com/kichikawa/ent"
 )
 
+// The CommentFunc type is an adapter to allow the use of ordinary
+// function as Comment mutator.
+type CommentFunc func(context.Context, *ent.CommentMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CommentFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CommentMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CommentMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The FollowFunc type is an adapter to allow the use of ordinary
+// function as Follow mutator.
+type FollowFunc func(context.Context, *ent.FollowMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f FollowFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.FollowMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.FollowMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The GoodFunc type is an adapter to allow the use of ordinary
+// function as Good mutator.
+type GoodFunc func(context.Context, *ent.GoodMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f GoodFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.GoodMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.GoodMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The RefreshTokenFunc type is an adapter to allow the use of ordinary
+// function as RefreshToken mutator.
+type RefreshTokenFunc func(context.Context, *ent.RefreshTokenMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f RefreshTokenFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.RefreshTokenMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.RefreshTokenMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The TweetFunc type is an adapter to allow the use of ordinary
+// function as Tweet mutator.
+type TweetFunc func(context.Context, *ent.TweetMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f TweetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.TweetMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.TweetMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

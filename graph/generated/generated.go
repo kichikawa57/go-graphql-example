@@ -13,7 +13,7 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/99designs/gqlgen/graphql/introspection"
 	"github.com/kichikawa/ent"
-	"github.com/kichikawa/ent/schema"
+	"github.com/kichikawa/ent/schema/property"
 	"github.com/kichikawa/graph/model"
 	gqlparser "github.com/vektah/gqlparser/v2"
 	"github.com/vektah/gqlparser/v2/ast"
@@ -55,10 +55,11 @@ type ComplexityRoot struct {
 	}
 
 	User struct {
-		Age    func(childComplexity int) int
-		Email  func(childComplexity int) int
-		ID     func(childComplexity int) int
-		Status func(childComplexity int) int
+		AccountName func(childComplexity int) int
+		Age         func(childComplexity int) int
+		Email       func(childComplexity int) int
+		ID          func(childComplexity int) int
+		Password    func(childComplexity int) int
 	}
 }
 
@@ -70,8 +71,6 @@ type QueryResolver interface {
 }
 type UserResolver interface {
 	ID(ctx context.Context, obj *ent.User) (model.UUID, error)
-
-	Status(ctx context.Context, obj *ent.User) (model.UserStatus, error)
 }
 
 type executableSchema struct {
@@ -108,6 +107,13 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.Query.GetUserList(childComplexity), true
 
+	case "User.accountName":
+		if e.complexity.User.AccountName == nil {
+			break
+		}
+
+		return e.complexity.User.AccountName(childComplexity), true
+
 	case "User.age":
 		if e.complexity.User.Age == nil {
 			break
@@ -129,12 +135,12 @@ func (e *executableSchema) Complexity(typeName, field string, childComplexity in
 
 		return e.complexity.User.ID(childComplexity), true
 
-	case "User.status":
-		if e.complexity.User.Status == nil {
+	case "User.password":
+		if e.complexity.User.Password == nil {
 			break
 		}
 
-		return e.complexity.User.Status(childComplexity), true
+		return e.complexity.User.Password(childComplexity), true
 
 	}
 	return 0, false
@@ -208,22 +214,19 @@ scalar UUID
 scalar Date
 
 scalar UserEmail
-
-enum UserStatus {
-  IN_PROGRESS
-  COMPLETED
-}
+scalar UserAccountName
 
 type User {
   id: UUID!
   email: UserEmail!
-  status: UserStatus!
+  accountName: UserAccountName!
+  password: String!
   age: Int!
 }
 
 input CreateUserInput {
   email: UserEmail!
-  status: UserStatus!
+  password: String!
   age: Int!
 }
 
@@ -538,12 +541,12 @@ func (ec *executionContext) _User_email(ctx context.Context, field graphql.Colle
 		}
 		return graphql.Null
 	}
-	res := resTmp.(schema.UserEmail)
+	res := resTmp.(property.UserEmail)
 	fc.Result = res
-	return ec.marshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚐUserEmail(ctx, field.Selections, res)
+	return ec.marshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚋpropertyᚐUserEmail(ctx, field.Selections, res)
 }
 
-func (ec *executionContext) _User_status(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+func (ec *executionContext) _User_accountName(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
 	defer func() {
 		if r := recover(); r != nil {
 			ec.Error(ctx, ec.Recover(ctx, r))
@@ -554,14 +557,14 @@ func (ec *executionContext) _User_status(ctx context.Context, field graphql.Coll
 		Object:     "User",
 		Field:      field,
 		Args:       nil,
-		IsMethod:   true,
-		IsResolver: true,
+		IsMethod:   false,
+		IsResolver: false,
 	}
 
 	ctx = graphql.WithFieldContext(ctx, fc)
 	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
 		ctx = rctx // use context from middleware stack in children
-		return ec.resolvers.User().Status(rctx, obj)
+		return obj.AccountName, nil
 	})
 	if err != nil {
 		ec.Error(ctx, err)
@@ -573,9 +576,44 @@ func (ec *executionContext) _User_status(ctx context.Context, field graphql.Coll
 		}
 		return graphql.Null
 	}
-	res := resTmp.(model.UserStatus)
+	res := resTmp.(property.UserAccountName)
 	fc.Result = res
-	return ec.marshalNUserStatus2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserStatus(ctx, field.Selections, res)
+	return ec.marshalNUserAccountName2githubᚗcomᚋkichikawaᚋentᚋschemaᚋpropertyᚐUserAccountName(ctx, field.Selections, res)
+}
+
+func (ec *executionContext) _User_password(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
+	defer func() {
+		if r := recover(); r != nil {
+			ec.Error(ctx, ec.Recover(ctx, r))
+			ret = graphql.Null
+		}
+	}()
+	fc := &graphql.FieldContext{
+		Object:     "User",
+		Field:      field,
+		Args:       nil,
+		IsMethod:   false,
+		IsResolver: false,
+	}
+
+	ctx = graphql.WithFieldContext(ctx, fc)
+	resTmp, err := ec.ResolverMiddleware(ctx, func(rctx context.Context) (interface{}, error) {
+		ctx = rctx // use context from middleware stack in children
+		return obj.Password, nil
+	})
+	if err != nil {
+		ec.Error(ctx, err)
+		return graphql.Null
+	}
+	if resTmp == nil {
+		if !graphql.HasFieldError(ctx, fc) {
+			ec.Errorf(ctx, "must not be null")
+		}
+		return graphql.Null
+	}
+	res := resTmp.(string)
+	fc.Result = res
+	return ec.marshalNString2string(ctx, field.Selections, res)
 }
 
 func (ec *executionContext) _User_age(ctx context.Context, field graphql.CollectedField, obj *ent.User) (ret graphql.Marshaler) {
@@ -1755,15 +1793,15 @@ func (ec *executionContext) unmarshalInputCreateUserInput(ctx context.Context, o
 			var err error
 
 			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("email"))
-			it.Email, err = ec.unmarshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚐUserEmail(ctx, v)
+			it.Email, err = ec.unmarshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚋpropertyᚐUserEmail(ctx, v)
 			if err != nil {
 				return it, err
 			}
-		case "status":
+		case "password":
 			var err error
 
-			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("status"))
-			it.Status, err = ec.unmarshalNUserStatus2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserStatus(ctx, v)
+			ctx := graphql.WithPathContext(ctx, graphql.NewPathWithField("password"))
+			it.Password, err = ec.unmarshalNString2string(ctx, v)
 			if err != nil {
 				return it, err
 			}
@@ -1936,26 +1974,26 @@ func (ec *executionContext) _User(ctx context.Context, sel ast.SelectionSet, obj
 			if out.Values[i] == graphql.Null {
 				atomic.AddUint32(&invalids, 1)
 			}
-		case "status":
-			field := field
-
+		case "accountName":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
-				defer func() {
-					if r := recover(); r != nil {
-						ec.Error(ctx, ec.Recover(ctx, r))
-					}
-				}()
-				res = ec._User_status(ctx, field, obj)
-				if res == graphql.Null {
-					atomic.AddUint32(&invalids, 1)
-				}
-				return res
+				return ec._User_accountName(ctx, field, obj)
 			}
 
-			out.Concurrently(i, func() graphql.Marshaler {
-				return innerFunc(ctx)
+			out.Values[i] = innerFunc(ctx)
 
-			})
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
+		case "password":
+			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
+				return ec._User_password(ctx, field, obj)
+			}
+
+			out.Values[i] = innerFunc(ctx)
+
+			if out.Values[i] == graphql.Null {
+				atomic.AddUint32(&invalids, 1)
+			}
 		case "age":
 			innerFunc := func(ctx context.Context) (res graphql.Marshaler) {
 				return ec._User_age(ctx, field, obj)
@@ -2504,13 +2542,13 @@ func (ec *executionContext) marshalNUser2ᚖgithubᚗcomᚋkichikawaᚋentᚐUse
 	return ec._User(ctx, sel, v)
 }
 
-func (ec *executionContext) unmarshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚐUserEmail(ctx context.Context, v interface{}) (schema.UserEmail, error) {
+func (ec *executionContext) unmarshalNUserAccountName2githubᚗcomᚋkichikawaᚋentᚋschemaᚋpropertyᚐUserAccountName(ctx context.Context, v interface{}) (property.UserAccountName, error) {
 	tmp, err := graphql.UnmarshalString(v)
-	res := schema.UserEmail(tmp)
+	res := property.UserAccountName(tmp)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚐUserEmail(ctx context.Context, sel ast.SelectionSet, v schema.UserEmail) graphql.Marshaler {
+func (ec *executionContext) marshalNUserAccountName2githubᚗcomᚋkichikawaᚋentᚋschemaᚋpropertyᚐUserAccountName(ctx context.Context, sel ast.SelectionSet, v property.UserAccountName) graphql.Marshaler {
 	res := graphql.MarshalString(string(v))
 	if res == graphql.Null {
 		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
@@ -2520,14 +2558,20 @@ func (ec *executionContext) marshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋs
 	return res
 }
 
-func (ec *executionContext) unmarshalNUserStatus2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserStatus(ctx context.Context, v interface{}) (model.UserStatus, error) {
-	var res model.UserStatus
-	err := res.UnmarshalGQL(v)
+func (ec *executionContext) unmarshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚋpropertyᚐUserEmail(ctx context.Context, v interface{}) (property.UserEmail, error) {
+	tmp, err := graphql.UnmarshalString(v)
+	res := property.UserEmail(tmp)
 	return res, graphql.ErrorOnPath(ctx, err)
 }
 
-func (ec *executionContext) marshalNUserStatus2githubᚗcomᚋkichikawaᚋgraphᚋmodelᚐUserStatus(ctx context.Context, sel ast.SelectionSet, v model.UserStatus) graphql.Marshaler {
-	return v
+func (ec *executionContext) marshalNUserEmail2githubᚗcomᚋkichikawaᚋentᚋschemaᚋpropertyᚐUserEmail(ctx context.Context, sel ast.SelectionSet, v property.UserEmail) graphql.Marshaler {
+	res := graphql.MarshalString(string(v))
+	if res == graphql.Null {
+		if !graphql.HasFieldError(ctx, graphql.GetFieldContext(ctx)) {
+			ec.Errorf(ctx, "must not be null")
+		}
+	}
+	return res
 }
 
 func (ec *executionContext) marshalN__Directive2githubᚗcomᚋ99designsᚋgqlgenᚋgraphqlᚋintrospectionᚐDirective(ctx context.Context, sel ast.SelectionSet, v introspection.Directive) graphql.Marshaler {

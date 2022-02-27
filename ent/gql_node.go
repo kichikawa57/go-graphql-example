@@ -11,6 +11,11 @@ import (
 	"github.com/99designs/gqlgen/graphql"
 	"github.com/google/uuid"
 	"github.com/hashicorp/go-multierror"
+	"github.com/kichikawa/ent/comment"
+	"github.com/kichikawa/ent/follow"
+	"github.com/kichikawa/ent/good"
+	"github.com/kichikawa/ent/refreshtoken"
+	"github.com/kichikawa/ent/tweet"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -41,12 +46,247 @@ type Edge struct {
 	IDs  []uuid.UUID `json:"ids,omitempty"`  // node ids (where this edge point to).
 }
 
+func (c *Comment) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     c.ID,
+		Type:   "Comment",
+		Fields: make([]*Field, 3),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(c.CreatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "created_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.UpdatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "updated_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.Text); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "text",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+func (f *Follow) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     f.ID,
+		Type:   "Follow",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(f.CreatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "created_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(f.UpdatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "updated_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(f.FollowerID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "uuid.UUID",
+		Name:  "follower_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(f.FollowedID); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "uuid.UUID",
+		Name:  "followed_id",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+func (_go *Good) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     _go.ID,
+		Type:   "Good",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(_go.CreatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "created_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(_go.UpdatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "updated_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(_go.UserID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "uuid.UUID",
+		Name:  "user_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(_go.TweetID); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "uuid.UUID",
+		Name:  "tweet_id",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+func (rt *RefreshToken) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     rt.ID,
+		Type:   "RefreshToken",
+		Fields: make([]*Field, 4),
+		Edges:  make([]*Edge, 0),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(rt.CreatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "created_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(rt.UpdatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "updated_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(rt.Token); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "string",
+		Name:  "token",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(rt.ExpiresAt); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "time.Time",
+		Name:  "expires_at",
+		Value: string(buf),
+	}
+	return node, nil
+}
+
+func (t *Tweet) Node(ctx context.Context) (node *Node, err error) {
+	node = &Node{
+		ID:     t.ID,
+		Type:   "Tweet",
+		Fields: make([]*Field, 5),
+		Edges:  make([]*Edge, 2),
+	}
+	var buf []byte
+	if buf, err = json.Marshal(t.CreatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[0] = &Field{
+		Type:  "time.Time",
+		Name:  "created_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.UpdatedAt); err != nil {
+		return nil, err
+	}
+	node.Fields[1] = &Field{
+		Type:  "time.Time",
+		Name:  "updated_at",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.UserID); err != nil {
+		return nil, err
+	}
+	node.Fields[2] = &Field{
+		Type:  "uuid.UUID",
+		Name:  "user_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.Text); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "string",
+		Name:  "text",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(t.Type); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
+		Type:  "property.TweetType",
+		Name:  "type",
+		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Good",
+		Name: "goods",
+	}
+	err = t.QueryGoods().
+		Select(good.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Comment",
+		Name: "comments",
+	}
+	err = t.QueryComments().
+		Select(comment.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	return node, nil
+}
+
 func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
 		Fields: make([]*Field, 6),
-		Edges:  make([]*Edge, 0),
+		Edges:  make([]*Edge, 5),
 	}
 	var buf []byte
 	if buf, err = json.Marshal(u.CreatedAt); err != nil {
@@ -69,7 +309,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
-		Type:  "string",
+		Type:  "property.UserAccountName",
 		Name:  "account_name",
 		Value: string(buf),
 	}
@@ -77,16 +317,16 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		return nil, err
 	}
 	node.Fields[3] = &Field{
-		Type:  "schema.UserEmail",
+		Type:  "property.UserEmail",
 		Name:  "email",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(u.Status); err != nil {
+	if buf, err = json.Marshal(u.Password); err != nil {
 		return nil, err
 	}
 	node.Fields[4] = &Field{
-		Type:  "user.Status",
-		Name:  "status",
+		Type:  "string",
+		Name:  "password",
 		Value: string(buf),
 	}
 	if buf, err = json.Marshal(u.Age); err != nil {
@@ -96,6 +336,56 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Type:  "int",
 		Name:  "age",
 		Value: string(buf),
+	}
+	node.Edges[0] = &Edge{
+		Type: "Tweet",
+		Name: "tweet",
+	}
+	err = u.QueryTweet().
+		Select(tweet.FieldID).
+		Scan(ctx, &node.Edges[0].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[1] = &Edge{
+		Type: "Good",
+		Name: "good",
+	}
+	err = u.QueryGood().
+		Select(good.FieldID).
+		Scan(ctx, &node.Edges[1].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[2] = &Edge{
+		Type: "Comment",
+		Name: "comment",
+	}
+	err = u.QueryComment().
+		Select(comment.FieldID).
+		Scan(ctx, &node.Edges[2].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[3] = &Edge{
+		Type: "Follow",
+		Name: "follower",
+	}
+	err = u.QueryFollower().
+		Select(follow.FieldID).
+		Scan(ctx, &node.Edges[3].IDs)
+	if err != nil {
+		return nil, err
+	}
+	node.Edges[4] = &Edge{
+		Type: "Follow",
+		Name: "followed",
+	}
+	err = u.QueryFollowed().
+		Select(follow.FieldID).
+		Scan(ctx, &node.Edges[4].IDs)
+	if err != nil {
+		return nil, err
 	}
 	return node, nil
 }
@@ -167,6 +457,51 @@ func (c *Client) Noder(ctx context.Context, id uuid.UUID, opts ...NodeOption) (_
 
 func (c *Client) noder(ctx context.Context, table string, id uuid.UUID) (Noder, error) {
 	switch table {
+	case comment.Table:
+		n, err := c.Comment.Query().
+			Where(comment.ID(id)).
+			CollectFields(ctx, "Comment").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case follow.Table:
+		n, err := c.Follow.Query().
+			Where(follow.ID(id)).
+			CollectFields(ctx, "Follow").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case good.Table:
+		n, err := c.Good.Query().
+			Where(good.ID(id)).
+			CollectFields(ctx, "Good").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case refreshtoken.Table:
+		n, err := c.RefreshToken.Query().
+			Where(refreshtoken.ID(id)).
+			CollectFields(ctx, "RefreshToken").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
+	case tweet.Table:
+		n, err := c.Tweet.Query().
+			Where(tweet.ID(id)).
+			CollectFields(ctx, "Tweet").
+			Only(ctx)
+		if err != nil {
+			return nil, err
+		}
+		return n, nil
 	case user.Table:
 		n, err := c.User.Query().
 			Where(user.ID(id)).
@@ -249,6 +584,71 @@ func (c *Client) noders(ctx context.Context, table string, ids []uuid.UUID) ([]N
 		idmap[id] = append(idmap[id], &noders[i])
 	}
 	switch table {
+	case comment.Table:
+		nodes, err := c.Comment.Query().
+			Where(comment.IDIn(ids...)).
+			CollectFields(ctx, "Comment").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case follow.Table:
+		nodes, err := c.Follow.Query().
+			Where(follow.IDIn(ids...)).
+			CollectFields(ctx, "Follow").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case good.Table:
+		nodes, err := c.Good.Query().
+			Where(good.IDIn(ids...)).
+			CollectFields(ctx, "Good").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case refreshtoken.Table:
+		nodes, err := c.RefreshToken.Query().
+			Where(refreshtoken.IDIn(ids...)).
+			CollectFields(ctx, "RefreshToken").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
+	case tweet.Table:
+		nodes, err := c.Tweet.Query().
+			Where(tweet.IDIn(ids...)).
+			CollectFields(ctx, "Tweet").
+			All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, node := range nodes {
+			for _, noder := range idmap[node.ID] {
+				*noder = node
+			}
+		}
 	case user.Table:
 		nodes, err := c.User.Query().
 			Where(user.IDIn(ids...)).

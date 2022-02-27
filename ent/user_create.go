@@ -11,7 +11,11 @@ import (
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
 	"github.com/google/uuid"
-	"github.com/kichikawa/ent/schema"
+	"github.com/kichikawa/ent/comment"
+	"github.com/kichikawa/ent/follow"
+	"github.com/kichikawa/ent/good"
+	"github.com/kichikawa/ent/schema/property"
+	"github.com/kichikawa/ent/tweet"
 	"github.com/kichikawa/ent/user"
 )
 
@@ -51,34 +55,26 @@ func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 }
 
 // SetAccountName sets the "account_name" field.
-func (uc *UserCreate) SetAccountName(s string) *UserCreate {
-	uc.mutation.SetAccountName(s)
+func (uc *UserCreate) SetAccountName(pan property.UserAccountName) *UserCreate {
+	uc.mutation.SetAccountName(pan)
 	return uc
 }
 
 // SetEmail sets the "email" field.
-func (uc *UserCreate) SetEmail(se schema.UserEmail) *UserCreate {
-	uc.mutation.SetEmail(se)
+func (uc *UserCreate) SetEmail(pe property.UserEmail) *UserCreate {
+	uc.mutation.SetEmail(pe)
 	return uc
 }
 
-// SetStatus sets the "status" field.
-func (uc *UserCreate) SetStatus(u user.Status) *UserCreate {
-	uc.mutation.SetStatus(u)
+// SetPassword sets the "password" field.
+func (uc *UserCreate) SetPassword(s string) *UserCreate {
+	uc.mutation.SetPassword(s)
 	return uc
 }
 
 // SetAge sets the "age" field.
 func (uc *UserCreate) SetAge(i int) *UserCreate {
 	uc.mutation.SetAge(i)
-	return uc
-}
-
-// SetNillableAge sets the "age" field if the given value is not nil.
-func (uc *UserCreate) SetNillableAge(i *int) *UserCreate {
-	if i != nil {
-		uc.SetAge(*i)
-	}
 	return uc
 }
 
@@ -94,6 +90,81 @@ func (uc *UserCreate) SetNillableID(u *uuid.UUID) *UserCreate {
 		uc.SetID(*u)
 	}
 	return uc
+}
+
+// AddTweetIDs adds the "tweet" edge to the Tweet entity by IDs.
+func (uc *UserCreate) AddTweetIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddTweetIDs(ids...)
+	return uc
+}
+
+// AddTweet adds the "tweet" edges to the Tweet entity.
+func (uc *UserCreate) AddTweet(t ...*Tweet) *UserCreate {
+	ids := make([]uuid.UUID, len(t))
+	for i := range t {
+		ids[i] = t[i].ID
+	}
+	return uc.AddTweetIDs(ids...)
+}
+
+// AddGoodIDs adds the "good" edge to the Good entity by IDs.
+func (uc *UserCreate) AddGoodIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddGoodIDs(ids...)
+	return uc
+}
+
+// AddGood adds the "good" edges to the Good entity.
+func (uc *UserCreate) AddGood(g ...*Good) *UserCreate {
+	ids := make([]uuid.UUID, len(g))
+	for i := range g {
+		ids[i] = g[i].ID
+	}
+	return uc.AddGoodIDs(ids...)
+}
+
+// AddCommentIDs adds the "comment" edge to the Comment entity by IDs.
+func (uc *UserCreate) AddCommentIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddCommentIDs(ids...)
+	return uc
+}
+
+// AddComment adds the "comment" edges to the Comment entity.
+func (uc *UserCreate) AddComment(c ...*Comment) *UserCreate {
+	ids := make([]uuid.UUID, len(c))
+	for i := range c {
+		ids[i] = c[i].ID
+	}
+	return uc.AddCommentIDs(ids...)
+}
+
+// AddFollowerIDs adds the "follower" edge to the Follow entity by IDs.
+func (uc *UserCreate) AddFollowerIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddFollowerIDs(ids...)
+	return uc
+}
+
+// AddFollower adds the "follower" edges to the Follow entity.
+func (uc *UserCreate) AddFollower(f ...*Follow) *UserCreate {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uc.AddFollowerIDs(ids...)
+}
+
+// AddFollowedIDs adds the "followed" edge to the Follow entity by IDs.
+func (uc *UserCreate) AddFollowedIDs(ids ...uuid.UUID) *UserCreate {
+	uc.mutation.AddFollowedIDs(ids...)
+	return uc
+}
+
+// AddFollowed adds the "followed" edges to the Follow entity.
+func (uc *UserCreate) AddFollowed(f ...*Follow) *UserCreate {
+	ids := make([]uuid.UUID, len(f))
+	for i := range f {
+		ids[i] = f[i].ID
+	}
+	return uc.AddFollowedIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -195,13 +266,26 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.Email(); !ok {
 		return &ValidationError{Name: "email", err: errors.New(`ent: missing required field "User.email"`)}
 	}
-	if _, ok := uc.mutation.Status(); !ok {
-		return &ValidationError{Name: "status", err: errors.New(`ent: missing required field "User.status"`)}
+	if _, ok := uc.mutation.Password(); !ok {
+		return &ValidationError{Name: "password", err: errors.New(`ent: missing required field "User.password"`)}
 	}
-	if v, ok := uc.mutation.Status(); ok {
-		if err := user.StatusValidator(v); err != nil {
-			return &ValidationError{Name: "status", err: fmt.Errorf(`ent: validator failed for field "User.status": %w`, err)}
-		}
+	if _, ok := uc.mutation.Age(); !ok {
+		return &ValidationError{Name: "age", err: errors.New(`ent: missing required field "User.age"`)}
+	}
+	if len(uc.mutation.TweetIDs()) == 0 {
+		return &ValidationError{Name: "tweet", err: errors.New(`ent: missing required edge "User.tweet"`)}
+	}
+	if len(uc.mutation.GoodIDs()) == 0 {
+		return &ValidationError{Name: "good", err: errors.New(`ent: missing required edge "User.good"`)}
+	}
+	if len(uc.mutation.CommentIDs()) == 0 {
+		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required edge "User.comment"`)}
+	}
+	if len(uc.mutation.FollowerIDs()) == 0 {
+		return &ValidationError{Name: "follower", err: errors.New(`ent: missing required edge "User.follower"`)}
+	}
+	if len(uc.mutation.FollowedIDs()) == 0 {
+		return &ValidationError{Name: "followed", err: errors.New(`ent: missing required edge "User.followed"`)}
 	}
 	return nil
 }
@@ -271,13 +355,13 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 		})
 		_node.Email = value
 	}
-	if value, ok := uc.mutation.Status(); ok {
+	if value, ok := uc.mutation.Password(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
+			Type:   field.TypeString,
 			Value:  value,
-			Column: user.FieldStatus,
+			Column: user.FieldPassword,
 		})
-		_node.Status = value
+		_node.Password = value
 	}
 	if value, ok := uc.mutation.Age(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
@@ -286,6 +370,101 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldAge,
 		})
 		_node.Age = value
+	}
+	if nodes := uc.mutation.TweetIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.TweetTable,
+			Columns: []string{user.TweetColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: tweet.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.GoodIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.GoodTable,
+			Columns: []string{user.GoodColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: good.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.CommentIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.CommentTable,
+			Columns: []string{user.CommentColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: comment.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.FollowerIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowerTable,
+			Columns: []string{user.FollowerColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.FollowedIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.FollowedTable,
+			Columns: []string{user.FollowedColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeUUID,
+					Column: follow.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }

@@ -3,9 +3,6 @@
 package user
 
 import (
-	"fmt"
-	"io"
-	"strconv"
 	"time"
 
 	"github.com/google/uuid"
@@ -24,12 +21,57 @@ const (
 	FieldAccountName = "account_name"
 	// FieldEmail holds the string denoting the email field in the database.
 	FieldEmail = "email"
-	// FieldStatus holds the string denoting the status field in the database.
-	FieldStatus = "status"
+	// FieldPassword holds the string denoting the password field in the database.
+	FieldPassword = "password"
 	// FieldAge holds the string denoting the age field in the database.
 	FieldAge = "age"
+	// EdgeTweet holds the string denoting the tweet edge name in mutations.
+	EdgeTweet = "tweet"
+	// EdgeGood holds the string denoting the good edge name in mutations.
+	EdgeGood = "good"
+	// EdgeComment holds the string denoting the comment edge name in mutations.
+	EdgeComment = "comment"
+	// EdgeFollower holds the string denoting the follower edge name in mutations.
+	EdgeFollower = "follower"
+	// EdgeFollowed holds the string denoting the followed edge name in mutations.
+	EdgeFollowed = "followed"
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// TweetTable is the table that holds the tweet relation/edge.
+	TweetTable = "tweets"
+	// TweetInverseTable is the table name for the Tweet entity.
+	// It exists in this package in order to avoid circular dependency with the "tweet" package.
+	TweetInverseTable = "tweets"
+	// TweetColumn is the table column denoting the tweet relation/edge.
+	TweetColumn = "user_id"
+	// GoodTable is the table that holds the good relation/edge.
+	GoodTable = "goods"
+	// GoodInverseTable is the table name for the Good entity.
+	// It exists in this package in order to avoid circular dependency with the "good" package.
+	GoodInverseTable = "goods"
+	// GoodColumn is the table column denoting the good relation/edge.
+	GoodColumn = "user_id"
+	// CommentTable is the table that holds the comment relation/edge.
+	CommentTable = "comments"
+	// CommentInverseTable is the table name for the Comment entity.
+	// It exists in this package in order to avoid circular dependency with the "comment" package.
+	CommentInverseTable = "comments"
+	// CommentColumn is the table column denoting the comment relation/edge.
+	CommentColumn = "user_id"
+	// FollowerTable is the table that holds the follower relation/edge.
+	FollowerTable = "follows"
+	// FollowerInverseTable is the table name for the Follow entity.
+	// It exists in this package in order to avoid circular dependency with the "follow" package.
+	FollowerInverseTable = "follows"
+	// FollowerColumn is the table column denoting the follower relation/edge.
+	FollowerColumn = "follower_id"
+	// FollowedTable is the table that holds the followed relation/edge.
+	FollowedTable = "follows"
+	// FollowedInverseTable is the table name for the Follow entity.
+	// It exists in this package in order to avoid circular dependency with the "follow" package.
+	FollowedInverseTable = "follows"
+	// FollowedColumn is the table column denoting the followed relation/edge.
+	FollowedColumn = "followed_id"
 )
 
 // Columns holds all SQL columns for user fields.
@@ -39,7 +81,7 @@ var Columns = []string{
 	FieldUpdatedAt,
 	FieldAccountName,
 	FieldEmail,
-	FieldStatus,
+	FieldPassword,
 	FieldAge,
 }
 
@@ -63,44 +105,3 @@ var (
 	// DefaultID holds the default value on creation for the "id" field.
 	DefaultID func() uuid.UUID
 )
-
-// Status defines the type for the "status" enum field.
-type Status string
-
-// Status values.
-const (
-	StatusInProgress Status = "IN_PROGRESS"
-	StatusCompleted  Status = "COMPLETED"
-)
-
-func (s Status) String() string {
-	return string(s)
-}
-
-// StatusValidator is a validator for the "status" field enum values. It is called by the builders before save.
-func StatusValidator(s Status) error {
-	switch s {
-	case StatusInProgress, StatusCompleted:
-		return nil
-	default:
-		return fmt.Errorf("user: invalid enum value for status field: %q", s)
-	}
-}
-
-// MarshalGQL implements graphql.Marshaler interface.
-func (s Status) MarshalGQL(w io.Writer) {
-	io.WriteString(w, strconv.Quote(s.String()))
-}
-
-// UnmarshalGQL implements graphql.Unmarshaler interface.
-func (s *Status) UnmarshalGQL(val interface{}) error {
-	str, ok := val.(string)
-	if !ok {
-		return fmt.Errorf("enum %T must be a string", val)
-	}
-	*s = Status(str)
-	if err := StatusValidator(*s); err != nil {
-		return fmt.Errorf("%s is not a valid Status", str)
-	}
-	return nil
-}
