@@ -7,8 +7,8 @@ import (
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
 	"github.com/kichikawa/ent"
-	"github.com/kichikawa/graph"
 	"github.com/kichikawa/graph/generated"
+	"github.com/kichikawa/graph/resolver"
 )
 
 func graphqlHandler() gin.HandlerFunc {
@@ -23,7 +23,7 @@ func graphqlHandler() gin.HandlerFunc {
 			log.Fatalf("failed opening connection to postgres: %v", err)
 		}
 
-		h := handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &graph.Resolver{
+		h := handler.GraphQL(generated.NewExecutableSchema(generated.Config{Resolvers: &resolver.Resolver{
 			Client: client,
 		}}))
 
