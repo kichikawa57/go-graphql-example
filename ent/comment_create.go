@@ -49,6 +49,18 @@ func (cc *CommentCreate) SetNillableUpdatedAt(t *time.Time) *CommentCreate {
 	return cc
 }
 
+// SetUserID sets the "user_id" field.
+func (cc *CommentCreate) SetUserID(u uuid.UUID) *CommentCreate {
+	cc.mutation.SetUserID(u)
+	return cc
+}
+
+// SetTweetID sets the "tweet_id" field.
+func (cc *CommentCreate) SetTweetID(u uuid.UUID) *CommentCreate {
+	cc.mutation.SetTweetID(u)
+	return cc
+}
+
 // SetText sets the "text" field.
 func (cc *CommentCreate) SetText(s string) *CommentCreate {
 	cc.mutation.SetText(s)
@@ -162,6 +174,12 @@ func (cc *CommentCreate) check() error {
 	if _, ok := cc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Comment.updated_at"`)}
 	}
+	if _, ok := cc.mutation.UserID(); !ok {
+		return &ValidationError{Name: "user_id", err: errors.New(`ent: missing required field "Comment.user_id"`)}
+	}
+	if _, ok := cc.mutation.TweetID(); !ok {
+		return &ValidationError{Name: "tweet_id", err: errors.New(`ent: missing required field "Comment.tweet_id"`)}
+	}
 	if _, ok := cc.mutation.Text(); !ok {
 		return &ValidationError{Name: "text", err: errors.New(`ent: missing required field "Comment.text"`)}
 	}
@@ -216,6 +234,22 @@ func (cc *CommentCreate) createSpec() (*Comment, *sqlgraph.CreateSpec) {
 			Column: comment.FieldUpdatedAt,
 		})
 		_node.UpdatedAt = value
+	}
+	if value, ok := cc.mutation.UserID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: comment.FieldUserID,
+		})
+		_node.UserID = value
+	}
+	if value, ok := cc.mutation.TweetID(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: comment.FieldTweetID,
+		})
+		_node.TweetID = value
 	}
 	if value, ok := cc.mutation.Text(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

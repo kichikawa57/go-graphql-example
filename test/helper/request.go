@@ -3,12 +3,16 @@ package helper
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
+	"github.com/kichikawa/auth"
 	"github.com/kichikawa/router"
 )
 
@@ -19,7 +23,7 @@ type Result struct {
 	Body   interface{} `json:"body"`
 }
 
-func Request(t *testing.T, pass string) *httptest.ResponseRecorder {
+func Request(t *testing.T, pass string, id ...uuid.UUID) *httptest.ResponseRecorder {
 	read, err := ioutil.ReadFile(pass)
 	if err != nil {
 		t.Errorf("request fail to file error %s", err.Error())
@@ -42,6 +46,17 @@ func Request(t *testing.T, pass string) *httptest.ResponseRecorder {
 		return nil
 	}
 
+	if len(id) != 0 {
+		time := time.Now()
+		token, tokenErr := auth.Generate(id[0], time)
+
+		if tokenErr != nil {
+			log.Fatal(tokenErr)
+			return nil
+		}
+
+		req.Header.Add(auth.HeaderKey, fmt.Sprintf("Bearer %s", token))
+	}
 	r.ServeHTTP(w, req)
 
 	return w

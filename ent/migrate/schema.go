@@ -13,9 +13,9 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "user_id", Type: field.TypeUUID},
+		{Name: "tweet_id", Type: field.TypeUUID},
 		{Name: "text", Type: field.TypeString, SchemaType: map[string]string{"postgres": "varchar(255)"}},
-		{Name: "tweet_id", Type: field.TypeUUID, Nullable: true},
-		{Name: "user_id", Type: field.TypeUUID, Nullable: true},
 	}
 	// CommentsTable holds the schema information for the "comments" table.
 	CommentsTable = &schema.Table{
@@ -31,7 +31,7 @@ var (
 			},
 			{
 				Symbol:     "comments_users_comment",
-				Columns:    []*schema.Column{CommentsColumns[5]},
+				Columns:    []*schema.Column{CommentsColumns[3]},
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
@@ -40,7 +40,17 @@ var (
 			{
 				Name:    "comment_text",
 				Unique:  false,
+				Columns: []*schema.Column{CommentsColumns[5]},
+			},
+			{
+				Name:    "comment_user_id",
+				Unique:  false,
 				Columns: []*schema.Column{CommentsColumns[3]},
+			},
+			{
+				Name:    "comment_tweet_id",
+				Unique:  false,
+				Columns: []*schema.Column{CommentsColumns[4]},
 			},
 		},
 	}
@@ -168,6 +178,7 @@ var (
 		{Name: "id", Type: field.TypeUUID},
 		{Name: "created_at", Type: field.TypeTime},
 		{Name: "updated_at", Type: field.TypeTime},
+		{Name: "name", Type: field.TypeString, SchemaType: map[string]string{"postgres": "varchar(30)"}},
 		{Name: "account_name", Type: field.TypeString, Unique: true, SchemaType: map[string]string{"postgres": "varchar(15)"}},
 		{Name: "email", Type: field.TypeString, Unique: true, SchemaType: map[string]string{"postgres": "varchar(30)"}},
 		{Name: "password", Type: field.TypeString, SchemaType: map[string]string{"postgres": "varchar(255)"}},
@@ -182,7 +193,7 @@ var (
 			{
 				Name:    "user_email_account_name",
 				Unique:  false,
-				Columns: []*schema.Column{UsersColumns[4], UsersColumns[3]},
+				Columns: []*schema.Column{UsersColumns[5], UsersColumns[4]},
 			},
 		},
 	}

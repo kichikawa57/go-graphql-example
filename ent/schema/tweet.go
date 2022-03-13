@@ -40,9 +40,9 @@ func (Tweet) Fields() []ent.Field {
 func (Tweet) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("goods", Good.Type).
-			StorageKey(edge.Column("tweet_id")).Required(),
+			StorageKey(edge.Column("tweet_id")),
 		edge.To("comments", Comment.Type).
-			StorageKey(edge.Column("tweet_id")).Required(),
+			StorageKey(edge.Column("tweet_id")),
 	}
 }
 

@@ -1,13 +1,13 @@
 package repository
 
 import (
-	"github.com/google/uuid"
 	"github.com/kichikawa/ent"
+	"github.com/kichikawa/ent/predicate"
 )
 
 type UserRepository interface {
-	ListId(id uuid.UUID) ([]*ent.User, error)
-	ShowId(id uuid.UUID) (*ent.User, error)
-	Update(user ent.User) (*ent.User, error)
+	List(where ...predicate.User) ([]*ent.User, error)
+	Show(where ...predicate.User) (*ent.User, error)
+	Update(user ent.User, where ...predicate.User) error
 	Create(user ent.User) (*ent.User, error)
 }

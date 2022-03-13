@@ -50,7 +50,7 @@ func (c *Comment) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     c.ID,
 		Type:   "Comment",
-		Fields: make([]*Field, 3),
+		Fields: make([]*Field, 5),
 		Edges:  make([]*Edge, 0),
 	}
 	var buf []byte
@@ -70,10 +70,26 @@ func (c *Comment) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "updated_at",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(c.Text); err != nil {
+	if buf, err = json.Marshal(c.UserID); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "uuid.UUID",
+		Name:  "user_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.TweetID); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
+		Type:  "uuid.UUID",
+		Name:  "tweet_id",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(c.Text); err != nil {
+		return nil, err
+	}
+	node.Fields[4] = &Field{
 		Type:  "string",
 		Name:  "text",
 		Value: string(buf),
@@ -285,7 +301,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	node = &Node{
 		ID:     u.ID,
 		Type:   "User",
-		Fields: make([]*Field, 6),
+		Fields: make([]*Field, 7),
 		Edges:  make([]*Edge, 5),
 	}
 	var buf []byte
@@ -305,10 +321,18 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 		Name:  "updated_at",
 		Value: string(buf),
 	}
-	if buf, err = json.Marshal(u.AccountName); err != nil {
+	if buf, err = json.Marshal(u.Name); err != nil {
 		return nil, err
 	}
 	node.Fields[2] = &Field{
+		Type:  "property.UserName",
+		Name:  "name",
+		Value: string(buf),
+	}
+	if buf, err = json.Marshal(u.AccountName); err != nil {
+		return nil, err
+	}
+	node.Fields[3] = &Field{
 		Type:  "property.UserAccountName",
 		Name:  "account_name",
 		Value: string(buf),
@@ -316,7 +340,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Email); err != nil {
 		return nil, err
 	}
-	node.Fields[3] = &Field{
+	node.Fields[4] = &Field{
 		Type:  "property.UserEmail",
 		Name:  "email",
 		Value: string(buf),
@@ -324,7 +348,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Password); err != nil {
 		return nil, err
 	}
-	node.Fields[4] = &Field{
+	node.Fields[5] = &Field{
 		Type:  "string",
 		Name:  "password",
 		Value: string(buf),
@@ -332,7 +356,7 @@ func (u *User) Node(ctx context.Context) (node *Node, err error) {
 	if buf, err = json.Marshal(u.Age); err != nil {
 		return nil, err
 	}
-	node.Fields[5] = &Field{
+	node.Fields[6] = &Field{
 		Type:  "int",
 		Name:  "age",
 		Value: string(buf),

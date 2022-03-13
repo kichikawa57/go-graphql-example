@@ -21,6 +21,10 @@ type Comment struct {
 	CreatedAt time.Time `json:"created_at,omitempty"`
 	// UpdatedAt holds the value of the "updated_at" field.
 	UpdatedAt time.Time `json:"updated_at,omitempty"`
+	// UserID holds the value of the "user_id" field.
+	UserID uuid.UUID `json:"user_id,omitempty"`
+	// TweetID holds the value of the "tweet_id" field.
+	TweetID uuid.UUID `json:"tweet_id,omitempty"`
 	// Text holds the value of the "text" field.
 	Text     string `json:"text,omitempty"`
 	tweet_id *uuid.UUID
@@ -36,7 +40,7 @@ func (*Comment) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = new(sql.NullString)
 		case comment.FieldCreatedAt, comment.FieldUpdatedAt:
 			values[i] = new(sql.NullTime)
-		case comment.FieldID:
+		case comment.FieldID, comment.FieldUserID, comment.FieldTweetID:
 			values[i] = new(uuid.UUID)
 		case comment.ForeignKeys[0]: // tweet_id
 			values[i] = &sql.NullScanner{S: new(uuid.UUID)}
@@ -74,6 +78,18 @@ func (c *Comment) assignValues(columns []string, values []interface{}) error {
 				return fmt.Errorf("unexpected type %T for field updated_at", values[i])
 			} else if value.Valid {
 				c.UpdatedAt = value.Time
+			}
+		case comment.FieldUserID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field user_id", values[i])
+			} else if value != nil {
+				c.UserID = *value
+			}
+		case comment.FieldTweetID:
+			if value, ok := values[i].(*uuid.UUID); !ok {
+				return fmt.Errorf("unexpected type %T for field tweet_id", values[i])
+			} else if value != nil {
+				c.TweetID = *value
 			}
 		case comment.FieldText:
 			if value, ok := values[i].(*sql.NullString); !ok {
@@ -127,6 +143,10 @@ func (c *Comment) String() string {
 	builder.WriteString(c.CreatedAt.Format(time.ANSIC))
 	builder.WriteString(", updated_at=")
 	builder.WriteString(c.UpdatedAt.Format(time.ANSIC))
+	builder.WriteString(", user_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.UserID))
+	builder.WriteString(", tweet_id=")
+	builder.WriteString(fmt.Sprintf("%v", c.TweetID))
 	builder.WriteString(", text=")
 	builder.WriteString(c.Text)
 	builder.WriteByte(')')

@@ -6,6 +6,7 @@ import (
 
 	"github.com/99designs/gqlgen/handler"
 	"github.com/gin-gonic/gin"
+	"github.com/kichikawa/auth"
 	"github.com/kichikawa/ent"
 	"github.com/kichikawa/graph/generated"
 	"github.com/kichikawa/graph/resolver"
@@ -40,9 +41,26 @@ func playgroundHandler() gin.HandlerFunc {
 	}
 }
 
+func AuthMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		_, tokenErr := auth.GetHeaderToken(c)
+
+		if tokenErr != nil {
+			c.AbortWithStatusJSON(401, gin.H{
+				"error": tokenErr.Error(),
+			})
+			return
+		}
+
+		c.Next()
+	}
+}
+
 func SetupRouter() *gin.Engine {
 
 	r := gin.Default()
+
+	r.Use(AuthMiddleware())
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(200, gin.H{

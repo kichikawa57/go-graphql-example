@@ -50,6 +50,14 @@ exec-db:
 test:
 	docker exec api go test -v
 
+.PHONY: test-auth
+test-auth:
+	docker exec api go test -v github.com/kichikawa/auth/... -count=1
+
+.PHONY: test-infra
+test-infra:
+	docker exec api go test -v github.com/kichikawa/infra/... -count=1
+
 .PHONY: restart
 restart: kill start
 

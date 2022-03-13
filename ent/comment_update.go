@@ -11,6 +11,7 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/google/uuid"
 	"github.com/kichikawa/ent/comment"
 	"github.com/kichikawa/ent/predicate"
 )
@@ -31,6 +32,18 @@ func (cu *CommentUpdate) Where(ps ...predicate.Comment) *CommentUpdate {
 // SetUpdatedAt sets the "updated_at" field.
 func (cu *CommentUpdate) SetUpdatedAt(t time.Time) *CommentUpdate {
 	cu.mutation.SetUpdatedAt(t)
+	return cu
+}
+
+// SetUserID sets the "user_id" field.
+func (cu *CommentUpdate) SetUserID(u uuid.UUID) *CommentUpdate {
+	cu.mutation.SetUserID(u)
+	return cu
+}
+
+// SetTweetID sets the "tweet_id" field.
+func (cu *CommentUpdate) SetTweetID(u uuid.UUID) *CommentUpdate {
+	cu.mutation.SetTweetID(u)
 	return cu
 }
 
@@ -133,6 +146,20 @@ func (cu *CommentUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: comment.FieldUpdatedAt,
 		})
 	}
+	if value, ok := cu.mutation.UserID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: comment.FieldUserID,
+		})
+	}
+	if value, ok := cu.mutation.TweetID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: comment.FieldTweetID,
+		})
+	}
 	if value, ok := cu.mutation.Text(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeString,
@@ -162,6 +189,18 @@ type CommentUpdateOne struct {
 // SetUpdatedAt sets the "updated_at" field.
 func (cuo *CommentUpdateOne) SetUpdatedAt(t time.Time) *CommentUpdateOne {
 	cuo.mutation.SetUpdatedAt(t)
+	return cuo
+}
+
+// SetUserID sets the "user_id" field.
+func (cuo *CommentUpdateOne) SetUserID(u uuid.UUID) *CommentUpdateOne {
+	cuo.mutation.SetUserID(u)
+	return cuo
+}
+
+// SetTweetID sets the "tweet_id" field.
+func (cuo *CommentUpdateOne) SetTweetID(u uuid.UUID) *CommentUpdateOne {
+	cuo.mutation.SetTweetID(u)
 	return cuo
 }
 
@@ -286,6 +325,20 @@ func (cuo *CommentUpdateOne) sqlSave(ctx context.Context) (_node *Comment, err e
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: comment.FieldUpdatedAt,
+		})
+	}
+	if value, ok := cuo.mutation.UserID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: comment.FieldUserID,
+		})
+	}
+	if value, ok := cuo.mutation.TweetID(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeUUID,
+			Value:  value,
+			Column: comment.FieldTweetID,
 		})
 	}
 	if value, ok := cuo.mutation.Text(); ok {

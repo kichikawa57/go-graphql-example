@@ -221,12 +221,6 @@ func (tc *TweetCreate) check() error {
 			return &ValidationError{Name: "type", err: fmt.Errorf(`ent: validator failed for field "Tweet.type": %w`, err)}
 		}
 	}
-	if len(tc.mutation.GoodsIDs()) == 0 {
-		return &ValidationError{Name: "goods", err: errors.New(`ent: missing required edge "Tweet.goods"`)}
-	}
-	if len(tc.mutation.CommentsIDs()) == 0 {
-		return &ValidationError{Name: "comments", err: errors.New(`ent: missing required edge "Tweet.comments"`)}
-	}
 	return nil
 }
 

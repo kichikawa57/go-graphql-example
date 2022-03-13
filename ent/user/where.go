@@ -109,6 +109,14 @@ func UpdatedAt(v time.Time) predicate.User {
 	})
 }
 
+// Name applies equality check predicate on the "name" field. It's identical to NameEQ.
+func Name(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldName), vc))
+	})
+}
+
 // AccountName applies equality check predicate on the "account_name" field. It's identical to AccountNameEQ.
 func AccountName(v property.UserAccountName) predicate.User {
 	vc := string(v)
@@ -288,6 +296,128 @@ func UpdatedAtLT(v time.Time) predicate.User {
 func UpdatedAtLTE(v time.Time) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.LTE(s.C(FieldUpdatedAt), v))
+	})
+}
+
+// NameEQ applies the EQ predicate on the "name" field.
+func NameEQ(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldName), vc))
+	})
+}
+
+// NameNEQ applies the NEQ predicate on the "name" field.
+func NameNEQ(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldName), vc))
+	})
+}
+
+// NameIn applies the In predicate on the "name" field.
+func NameIn(vs ...property.UserName) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = string(vs[i])
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldName), v...))
+	})
+}
+
+// NameNotIn applies the NotIn predicate on the "name" field.
+func NameNotIn(vs ...property.UserName) predicate.User {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = string(vs[i])
+	}
+	return predicate.User(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldName), v...))
+	})
+}
+
+// NameGT applies the GT predicate on the "name" field.
+func NameGT(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GT(s.C(FieldName), vc))
+	})
+}
+
+// NameGTE applies the GTE predicate on the "name" field.
+func NameGTE(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.GTE(s.C(FieldName), vc))
+	})
+}
+
+// NameLT applies the LT predicate on the "name" field.
+func NameLT(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LT(s.C(FieldName), vc))
+	})
+}
+
+// NameLTE applies the LTE predicate on the "name" field.
+func NameLTE(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.LTE(s.C(FieldName), vc))
+	})
+}
+
+// NameContains applies the Contains predicate on the "name" field.
+func NameContains(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.Contains(s.C(FieldName), vc))
+	})
+}
+
+// NameHasPrefix applies the HasPrefix predicate on the "name" field.
+func NameHasPrefix(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasPrefix(s.C(FieldName), vc))
+	})
+}
+
+// NameHasSuffix applies the HasSuffix predicate on the "name" field.
+func NameHasSuffix(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.HasSuffix(s.C(FieldName), vc))
+	})
+}
+
+// NameEqualFold applies the EqualFold predicate on the "name" field.
+func NameEqualFold(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.EqualFold(s.C(FieldName), vc))
+	})
+}
+
+// NameContainsFold applies the ContainsFold predicate on the "name" field.
+func NameContainsFold(v property.UserName) predicate.User {
+	vc := string(v)
+	return predicate.User(func(s *sql.Selector) {
+		s.Where(sql.ContainsFold(s.C(FieldName), vc))
 	})
 }
 

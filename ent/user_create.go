@@ -54,6 +54,12 @@ func (uc *UserCreate) SetNillableUpdatedAt(t *time.Time) *UserCreate {
 	return uc
 }
 
+// SetName sets the "name" field.
+func (uc *UserCreate) SetName(pn property.UserName) *UserCreate {
+	uc.mutation.SetName(pn)
+	return uc
+}
+
 // SetAccountName sets the "account_name" field.
 func (uc *UserCreate) SetAccountName(pan property.UserAccountName) *UserCreate {
 	uc.mutation.SetAccountName(pan)
@@ -260,6 +266,9 @@ func (uc *UserCreate) check() error {
 	if _, ok := uc.mutation.UpdatedAt(); !ok {
 		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "User.updated_at"`)}
 	}
+	if _, ok := uc.mutation.Name(); !ok {
+		return &ValidationError{Name: "name", err: errors.New(`ent: missing required field "User.name"`)}
+	}
 	if _, ok := uc.mutation.AccountName(); !ok {
 		return &ValidationError{Name: "account_name", err: errors.New(`ent: missing required field "User.account_name"`)}
 	}
@@ -271,21 +280,6 @@ func (uc *UserCreate) check() error {
 	}
 	if _, ok := uc.mutation.Age(); !ok {
 		return &ValidationError{Name: "age", err: errors.New(`ent: missing required field "User.age"`)}
-	}
-	if len(uc.mutation.TweetIDs()) == 0 {
-		return &ValidationError{Name: "tweet", err: errors.New(`ent: missing required edge "User.tweet"`)}
-	}
-	if len(uc.mutation.GoodIDs()) == 0 {
-		return &ValidationError{Name: "good", err: errors.New(`ent: missing required edge "User.good"`)}
-	}
-	if len(uc.mutation.CommentIDs()) == 0 {
-		return &ValidationError{Name: "comment", err: errors.New(`ent: missing required edge "User.comment"`)}
-	}
-	if len(uc.mutation.FollowerIDs()) == 0 {
-		return &ValidationError{Name: "follower", err: errors.New(`ent: missing required edge "User.follower"`)}
-	}
-	if len(uc.mutation.FollowedIDs()) == 0 {
-		return &ValidationError{Name: "followed", err: errors.New(`ent: missing required edge "User.followed"`)}
 	}
 	return nil
 }
@@ -338,6 +332,14 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldUpdatedAt,
 		})
 		_node.UpdatedAt = value
+	}
+	if value, ok := uc.mutation.Name(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldName,
+		})
+		_node.Name = value
 	}
 	if value, ok := uc.mutation.AccountName(); ok {
 		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{

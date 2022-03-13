@@ -40,6 +40,12 @@ func (uu *UserUpdate) SetUpdatedAt(t time.Time) *UserUpdate {
 	return uu
 }
 
+// SetName sets the "name" field.
+func (uu *UserUpdate) SetName(pn property.UserName) *UserUpdate {
+	uu.mutation.SetName(pn)
+	return uu
+}
+
 // SetAccountName sets the "account_name" field.
 func (uu *UserUpdate) SetAccountName(pan property.UserAccountName) *UserUpdate {
 	uu.mutation.SetAccountName(pan)
@@ -342,6 +348,13 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: user.FieldUpdatedAt,
+		})
+	}
+	if value, ok := uu.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldName,
 		})
 	}
 	if value, ok := uu.mutation.AccountName(); ok {
@@ -674,6 +687,12 @@ func (uuo *UserUpdateOne) SetUpdatedAt(t time.Time) *UserUpdateOne {
 	return uuo
 }
 
+// SetName sets the "name" field.
+func (uuo *UserUpdateOne) SetName(pn property.UserName) *UserUpdateOne {
+	uuo.mutation.SetName(pn)
+	return uuo
+}
+
 // SetAccountName sets the "account_name" field.
 func (uuo *UserUpdateOne) SetAccountName(pan property.UserAccountName) *UserUpdateOne {
 	uuo.mutation.SetAccountName(pan)
@@ -1000,6 +1019,13 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: user.FieldUpdatedAt,
+		})
+	}
+	if value, ok := uuo.mutation.Name(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeString,
+			Value:  value,
+			Column: user.FieldName,
 		})
 	}
 	if value, ok := uuo.mutation.AccountName(); ok {

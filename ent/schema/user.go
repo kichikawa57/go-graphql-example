@@ -26,6 +26,11 @@ func (User) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
+		field.String("name").
+			SchemaType(map[string]string{
+				dialect.Postgres: "varchar(30)",
+			}).
+			GoType(property.UserName("")),
 		field.String("account_name").
 			SchemaType(map[string]string{
 				dialect.Postgres: "varchar(15)",
@@ -53,15 +58,15 @@ func (User) Fields() []ent.Field {
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
 		edge.To("tweet", Tweet.Type).
-			StorageKey(edge.Column("user_id")).Required(),
+			StorageKey(edge.Column("user_id")),
 		edge.To("good", Good.Type).
-			StorageKey(edge.Column("user_id")).Required(),
+			StorageKey(edge.Column("user_id")),
 		edge.To("comment", Comment.Type).
-			StorageKey(edge.Column("user_id")).Required(),
+			StorageKey(edge.Column("user_id")),
 		edge.To("follower", Follow.Type).
-			StorageKey(edge.Column("follower_id")).Required(),
+			StorageKey(edge.Column("follower_id")),
 		edge.To("followed", Follow.Type).
-			StorageKey(edge.Column("followed_id")).Required(),
+			StorageKey(edge.Column("followed_id")),
 	}
 }
 

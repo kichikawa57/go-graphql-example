@@ -47,6 +47,8 @@ type CommentMutation struct {
 	id            *uuid.UUID
 	created_at    *time.Time
 	updated_at    *time.Time
+	user_id       *uuid.UUID
+	tweet_id      *uuid.UUID
 	text          *string
 	clearedFields map[string]struct{}
 	done          bool
@@ -230,6 +232,78 @@ func (m *CommentMutation) ResetUpdatedAt() {
 	m.updated_at = nil
 }
 
+// SetUserID sets the "user_id" field.
+func (m *CommentMutation) SetUserID(u uuid.UUID) {
+	m.user_id = &u
+}
+
+// UserID returns the value of the "user_id" field in the mutation.
+func (m *CommentMutation) UserID() (r uuid.UUID, exists bool) {
+	v := m.user_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldUserID returns the old "user_id" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldUserID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldUserID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldUserID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldUserID: %w", err)
+	}
+	return oldValue.UserID, nil
+}
+
+// ResetUserID resets all changes to the "user_id" field.
+func (m *CommentMutation) ResetUserID() {
+	m.user_id = nil
+}
+
+// SetTweetID sets the "tweet_id" field.
+func (m *CommentMutation) SetTweetID(u uuid.UUID) {
+	m.tweet_id = &u
+}
+
+// TweetID returns the value of the "tweet_id" field in the mutation.
+func (m *CommentMutation) TweetID() (r uuid.UUID, exists bool) {
+	v := m.tweet_id
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldTweetID returns the old "tweet_id" field's value of the Comment entity.
+// If the Comment object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CommentMutation) OldTweetID(ctx context.Context) (v uuid.UUID, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldTweetID is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldTweetID requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldTweetID: %w", err)
+	}
+	return oldValue.TweetID, nil
+}
+
+// ResetTweetID resets all changes to the "tweet_id" field.
+func (m *CommentMutation) ResetTweetID() {
+	m.tweet_id = nil
+}
+
 // SetText sets the "text" field.
 func (m *CommentMutation) SetText(s string) {
 	m.text = &s
@@ -285,12 +359,18 @@ func (m *CommentMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CommentMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 5)
 	if m.created_at != nil {
 		fields = append(fields, comment.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, comment.FieldUpdatedAt)
+	}
+	if m.user_id != nil {
+		fields = append(fields, comment.FieldUserID)
+	}
+	if m.tweet_id != nil {
+		fields = append(fields, comment.FieldTweetID)
 	}
 	if m.text != nil {
 		fields = append(fields, comment.FieldText)
@@ -307,6 +387,10 @@ func (m *CommentMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case comment.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case comment.FieldUserID:
+		return m.UserID()
+	case comment.FieldTweetID:
+		return m.TweetID()
 	case comment.FieldText:
 		return m.Text()
 	}
@@ -322,6 +406,10 @@ func (m *CommentMutation) OldField(ctx context.Context, name string) (ent.Value,
 		return m.OldCreatedAt(ctx)
 	case comment.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case comment.FieldUserID:
+		return m.OldUserID(ctx)
+	case comment.FieldTweetID:
+		return m.OldTweetID(ctx)
 	case comment.FieldText:
 		return m.OldText(ctx)
 	}
@@ -346,6 +434,20 @@ func (m *CommentMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case comment.FieldUserID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetUserID(v)
+		return nil
+	case comment.FieldTweetID:
+		v, ok := value.(uuid.UUID)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetTweetID(v)
 		return nil
 	case comment.FieldText:
 		v, ok := value.(string)
@@ -408,6 +510,12 @@ func (m *CommentMutation) ResetField(name string) error {
 		return nil
 	case comment.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case comment.FieldUserID:
+		m.ResetUserID()
+		return nil
+	case comment.FieldTweetID:
+		m.ResetTweetID()
 		return nil
 	case comment.FieldText:
 		m.ResetText()
@@ -2618,6 +2726,7 @@ type UserMutation struct {
 	id              *uuid.UUID
 	created_at      *time.Time
 	updated_at      *time.Time
+	name            *property.UserName
 	account_name    *property.UserAccountName
 	email           *property.UserEmail
 	password        *string
@@ -2818,6 +2927,42 @@ func (m *UserMutation) OldUpdatedAt(ctx context.Context) (v time.Time, err error
 // ResetUpdatedAt resets all changes to the "updated_at" field.
 func (m *UserMutation) ResetUpdatedAt() {
 	m.updated_at = nil
+}
+
+// SetName sets the "name" field.
+func (m *UserMutation) SetName(pn property.UserName) {
+	m.name = &pn
+}
+
+// Name returns the value of the "name" field in the mutation.
+func (m *UserMutation) Name() (r property.UserName, exists bool) {
+	v := m.name
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldName returns the old "name" field's value of the User entity.
+// If the User object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *UserMutation) OldName(ctx context.Context) (v property.UserName, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, errors.New("OldName is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, errors.New("OldName requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldName: %w", err)
+	}
+	return oldValue.Name, nil
+}
+
+// ResetName resets all changes to the "name" field.
+func (m *UserMutation) ResetName() {
+	m.name = nil
 }
 
 // SetAccountName sets the "account_name" field.
@@ -3273,12 +3418,15 @@ func (m *UserMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *UserMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.created_at != nil {
 		fields = append(fields, user.FieldCreatedAt)
 	}
 	if m.updated_at != nil {
 		fields = append(fields, user.FieldUpdatedAt)
+	}
+	if m.name != nil {
+		fields = append(fields, user.FieldName)
 	}
 	if m.account_name != nil {
 		fields = append(fields, user.FieldAccountName)
@@ -3304,6 +3452,8 @@ func (m *UserMutation) Field(name string) (ent.Value, bool) {
 		return m.CreatedAt()
 	case user.FieldUpdatedAt:
 		return m.UpdatedAt()
+	case user.FieldName:
+		return m.Name()
 	case user.FieldAccountName:
 		return m.AccountName()
 	case user.FieldEmail:
@@ -3325,6 +3475,8 @@ func (m *UserMutation) OldField(ctx context.Context, name string) (ent.Value, er
 		return m.OldCreatedAt(ctx)
 	case user.FieldUpdatedAt:
 		return m.OldUpdatedAt(ctx)
+	case user.FieldName:
+		return m.OldName(ctx)
 	case user.FieldAccountName:
 		return m.OldAccountName(ctx)
 	case user.FieldEmail:
@@ -3355,6 +3507,13 @@ func (m *UserMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetUpdatedAt(v)
+		return nil
+	case user.FieldName:
+		v, ok := value.(property.UserName)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetName(v)
 		return nil
 	case user.FieldAccountName:
 		v, ok := value.(property.UserAccountName)
@@ -3453,6 +3612,9 @@ func (m *UserMutation) ResetField(name string) error {
 		return nil
 	case user.FieldUpdatedAt:
 		m.ResetUpdatedAt()
+		return nil
+	case user.FieldName:
+		m.ResetName()
 		return nil
 	case user.FieldAccountName:
 		m.ResetAccountName()

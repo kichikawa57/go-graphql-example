@@ -24,6 +24,8 @@ func (Comment) Fields() []ent.Field {
 	return []ent.Field{
 		field.UUID("id", uuid.UUID{}).
 			Default(uuid.New),
+		field.UUID("user_id", uuid.UUID{}),
+		field.UUID("tweet_id", uuid.UUID{}),
 		field.String("text").
 			SchemaType(map[string]string{
 				dialect.Postgres: "varchar(255)",
@@ -39,5 +41,7 @@ func (Comment) Edges() []ent.Edge {
 func (Comment) Indexes() []ent.Index {
 	return []ent.Index{
 		index.Fields("text"),
+		index.Fields("user_id"),
+		index.Fields("tweet_id"),
 	}
 }
